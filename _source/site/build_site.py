@@ -158,7 +158,10 @@ TEMPLATE = open('/home/claude/site/template.html', encoding='utf-8').read()
 out = TEMPLATE.replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
 # 快取更新：每次重建都給圖片與影片加上版本號，並請瀏覽器重新檢查網頁
 import re as _re, time as _time
-_ver = _time.strftime('%Y%m%d%H%M')
+import datetime as _dt, zoneinfo as _zi
+_now = _dt.datetime.now(_zi.ZoneInfo('Europe/Vienna'))
+_ver = _now.strftime('%Y%m%d%H%M')
+out = out.replace('__UPDATED__', f'{_now.year} 年 {_now.month} 月 {_now.day} 日 {_now:%H:%M}')
 out = _re.sub(r'((?:img|vid)/[^"?\s]+\.(?:jpg|jpeg|png|mp4))(?=")', r'\1?v=' + _ver, out)
 _meta = '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">'
 if 'http-equiv="Cache-Control"' not in out:
