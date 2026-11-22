@@ -1,18 +1,27 @@
-# 每次推送到 main，就請 GitHub Pages 重新發佈網站
-# （從 Claude 推送的更新不會自動觸發 Pages，所以用這個步驟補上）
-name: 重新發佈網站
+# 每次推送到 main，就把網站發佈到 GitHub Pages
+# 需要在 GitHub：Settings → Pages → Build and deployment → Source 選「GitHub Actions」
+name: 發佈網站
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
-  pages: write
   contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
 jobs:
-  rebuild:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 請 GitHub Pages 重新建置
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+      - id: deployment
+        uses: actions/deploy-pages@v4
