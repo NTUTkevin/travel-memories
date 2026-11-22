@@ -156,5 +156,12 @@ for k,n,d,m in TRIPS:
     if cs: trips_html += f'  <section class="trip">\n    <div class="triphead"><h2>{n}</h2><span>{d}</span></div>\n    <div class="grid">\n' + '\n'.join(cs) + '\n    </div>\n  </section>\n'
 TEMPLATE = open('/home/claude/site/template.html', encoding='utf-8').read()
 out = TEMPLATE.replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
+# 快取更新：每次重建都給圖片與影片加上版本號，並請瀏覽器重新檢查網頁
+import re as _re, time as _time
+_ver = _time.strftime('%Y%m%d%H%M')
+out = _re.sub(r'((?:img|vid)/[^"?\s]+\.(?:jpg|jpeg|png|mp4))(?=")', r'\1?v=' + _ver, out)
+_meta = '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">'
+if 'http-equiv="Cache-Control"' not in out:
+    out = out.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + _meta, 1)
 open(f'{OUT}/index.html', 'w', encoding='utf-8').write(out)
 print(os.path.getsize(f'{OUT}/index.html'), 'bytes html')
