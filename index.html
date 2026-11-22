@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我們的旅行回憶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* layout idea: a travel diary. Slate-blue rain palette taken from the photos, gold for headings' accents, wine for verses. Home is a stack of trips (each a row of cards); a post is a reading column with a sticky chapter list. */
+:root {
+  --bg: #eceff2;
+  --surface: #ffffff;
+  --ink: #1c2330;
+  --muted: #586174;
+  --line: #d3d8e0;
+  --gold: #8a6a2f;
+  --wine: #7a2e2e;
+  --heart: #f6f1e4;
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --latin: "Cormorant Garamond", Georgia, serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11151c; --surface: #1a202a; --ink: #e6e9ef; --muted: #9ea6b5; --line: #2b3340;
+    --gold: #d4b36a; --wine: #e3a0a0; --heart: #231f15; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11151c; --surface: #1a202a; --ink: #e6e9ef; --muted: #9ea6b5; --line: #2b3340;
+  --gold: #d4b36a; --wine: #e3a0a0; --heart: #231f15; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--serif); font-size: 17px; line-height: 1.95; -webkit-text-size-adjust: 100%; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+img { max-width: 100%; height: auto; display: block; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+.topbar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.topbar .wrap { display: flex; align-items: center; justify-content: space-between; height: 52px; gap: 12px; }
+.brand { text-decoration: none; font-weight: 700; letter-spacing: .08em; font-size: 15px; display: flex; align-items: baseline; gap: 10px; }
+.brand i { font-family: var(--latin); font-weight: 500; color: var(--gold); font-size: 16px; letter-spacing: .02em; }
+.back { text-decoration: none; font-size: 14px; color: var(--muted); }
+.back:hover { color: var(--ink); }
+
+/* home */
+.hero { padding: 56px 0 28px; max-width: 760px; }
+.eyebrow { font-family: var(--latin); font-style: italic; font-weight: 500; font-size: 20px; color: var(--gold); letter-spacing: .02em; }
+.hero h1 { font-size: clamp(34px, 7vw, 56px); line-height: 1.25; margin: 6px 0 16px; letter-spacing: .04em; text-wrap: balance; }
+.hero p { margin: 0; color: var(--muted); font-size: 18px; max-width: 34em; }
+.trip { padding: 36px 0 8px; }
+.vidrow { display:flex; flex-wrap:wrap; gap:18px; margin:18px 0 8px; }
+.fbgrid { display:flex; flex-wrap:wrap; gap:20px; }
+.vid { margin:0; width:300px; max-width:100%; }
+.vid video { width:100%; background:#000; display:block; }
+.vid figcaption { font-size:15px; color:var(--muted); line-height:1.7; margin-top:8px; }
+.fbvid { display:flex; flex-direction:column; gap:8px; max-width:100%; }
+.fblink { display:block; padding:18px 24px; border:1px solid var(--line); background:var(--surface); color:var(--ink); text-decoration:none; font-size:17px; }
+.fblink:hover { border-color:var(--gold); }
+.triphead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; border-top: 2px solid var(--ink); padding-top: 14px; margin-bottom: 20px; }
+.triphead h2 { font-size: 26px; margin: 0; letter-spacing: .06em; }
+.triphead span { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 22px; }
+.card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); text-decoration: none; transition: transform .2s, border-color .2s; }
+.card:hover { transform: translateY(-3px); border-color: var(--gold); }
+.cardimg { aspect-ratio: 4 / 3; overflow: hidden; background: var(--line); }
+.cardimg img { width: 100%; height: 100%; object-fit: cover; }
+.cardtxt { padding: 16px 18px 20px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.cardtxt h3 { margin: 0; font-size: 20px; line-height: 1.5; text-wrap: balance; }
+.cardtxt p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+.place { font-size: 13px; color: var(--gold); letter-spacing: .06em; }
+.meta { font-size: 13px; color: var(--muted); margin-top: auto; padding-top: 6px; }
+.next { margin: 44px 0 0; padding: 22px 24px; border: 1px dashed var(--line); color: var(--muted); font-size: 15px; }
+footer.site { padding: 56px 0 72px; color: var(--muted); font-size: 14px; }
+
+/* post */
+.posthead { padding: 48px 0 20px; max-width: 760px; }
+.posthead h1 { font-size: clamp(30px, 6vw, 46px); line-height: 1.35; margin: 8px 0 10px; text-wrap: balance; }
+.posthead .meta { padding: 0; margin: 0; }
+.postgrid { display: grid; grid-template-columns: 1fr; gap: 0 56px; padding-bottom: 40px; }
+.toc { font-size: 14px; line-height: 1.6; margin: 0 0 24px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); }
+.toc b { display: block; color: var(--gold); margin-bottom: 8px; letter-spacing: .08em; font-weight: 600; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.toc button { background: none; border: 0; padding: 5px 0; text-align: left; cursor: pointer; color: var(--muted); width: 100%; }
+.toc button:hover { color: var(--ink); }
+@media (min-width: 980px) {
+  .postgrid { grid-template-columns: 230px minmax(0, 1fr); }
+  .toc { position: sticky; top: 76px; align-self: start; margin: 0; border: 0; background: none; padding: 0; border-left: 2px solid var(--line); padding-left: 16px; }
+}
+.prose { max-width: 40em; }
+.prose p { margin: 0 0 1.1em; }
+.prose h2 { font-size: 26px; line-height: 1.5; margin: 2.2em 0 .7em; padding-top: 1em; border-top: 1px solid var(--line); text-wrap: balance; scroll-margin-top: 70px; }
+.prose h2:first-child { margin-top: 0; border-top: 0; padding-top: 0; }
+.prose h3 { font-size: 20px; margin: 1.6em 0 .4em; color: var(--gold); }
+.prose h4 { font-size: 17px; margin: 1.3em 0 .3em; }
+.prose ul, .prose ol { padding-left: 1.3em; margin: 0 0 1.2em; }
+.prose li { margin-bottom: .4em; }
+figure { margin: 1.8em 0; }
+figure img { background: var(--line); }
+figure.landscape img { width: 100%; }
+figure.portrait img { max-height: 76vh; width: auto; margin: 0 auto; }
+figcaption { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--muted); text-align: center; }
+.verse { margin: 1.8em 0; padding: 4px 0 4px 20px; border-left: 3px solid var(--wine); }
+.verse p { margin: 0; font-style: italic; color: var(--wine); font-size: 18px; }
+.verse cite { display: block; margin-top: 6px; font-style: normal; font-size: 14px; color: var(--muted); }
+.heart { margin: 1.8em 0 2.4em; padding: 16px 20px 6px; background: var(--heart); border-left: 4px solid var(--gold); }
+.heart span { display: block; font-size: 13px; letter-spacing: .14em; color: var(--gold); font-weight: 700; margin-bottom: 4px; }
+.heart p { margin: 0 0 .8em; }
+.quote { margin: 1.4em 0; padding: 4px 18px; border-left: 3px solid var(--line); color: var(--muted); }
+.refs { margin-top: 2.4em; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; line-height: 1.8; color: var(--muted); }
+.tablewrap { overflow-x: auto; margin: 1.2em 0; }
+.tablewrap table { border-collapse: collapse; font-size: 15px; }
+.tablewrap td, .tablewrap th { border: 1px solid var(--line); padding: 6px 10px; }
+.pn { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 3em; }
+.pn a { display: block; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); text-decoration: none; line-height: 1.6; }
+.pn a:hover { border-color: var(--gold); }
+.pn a.r { text-align: right; }
+.pn small { display: block; color: var(--gold); font-size: 12px; letter-spacing: .1em; }
+@media (max-width: 560px) { .pn { grid-template-columns: 1fr; } body { font-size: 16.5px; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap">
+  <a class="brand" href="#home" data-go="home">我們的旅行回憶 <i>Reisetagebuch</i></a>
+  <a class="back" id="backlink" href="#home" data-go="home" hidden>← 全部文章</a>
+</div></header>
+
+<main class="wrap">
+<section id="view-home">
+  <div class="hero">
+    <div class="eyebrow">Unsere Reise</div>
+    <h1>我們的旅行回憶</h1>
+    <p>我和太太一起走過的地方。每到一個景點，先查清楚它的歷史，再放上我們拍的照片、一節經文，和那一刻的感動。</p>
+  </div>
+  <section class="trip">
+    <div class="triphead"><h2>德國・國王湖與拉姆紹</h2><span>2026 年 11 月 19 日</span></div>
+    <div class="grid">
+<a class="card" href="#koenigssee" data-go="koenigssee">
+  <div class="cardimg"><img src="img/koenigssee-08.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">國王湖 Königssee</span><h3>國王湖：湖邊的步道，和新認識的朋友</h3><p>湖邊小鎮、只准電動船的湖、步道上的觀景台，還有第二天認識的新朋友宜恩。</p><span class="meta">約 8 分鐘 · 11 張照片</span></div></a>
+<a class="card" href="#bartholomae" data-go="bartholomae">
+  <div class="cardimg"><img src="img/bartholomae-04.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">聖巴多羅買教堂 St. Bartholomä</span><h3>聖巴多羅買教堂：湖上的紅色洋蔥頂</h3><p>只有船能到的半島。1134 年的教堂、紅色洋蔥頂、祭壇，還有背後 1,800 公尺高的瓦茨曼東壁。</p><span class="meta">約 6 分鐘 · 10 張照片</span></div></a>
+<a class="card" href="#ramsau" data-go="ramsau">
+  <div class="cardimg"><img src="img/ramsau-06.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">拉姆紹教堂 Ramsau St. Sebastian</span><h3>拉姆紹教堂：霧裡的洋蔥頂</h3><p>1512 年蓋在運鹽古道旁的教堂，溪邊的畫家角度、墓園裡的登山嚮導與《平安夜》作詞人，還有牆上的日晷。</p><span class="meta">約 7 分鐘 · 14 張照片</span></div></a>
+    </div>
+  </section>
+  <section class="trip">
+    <div class="triphead"><h2>奧地利・薩爾斯堡</h2><span>2026 年 11 月 21 日</span></div>
+    <div class="grid">
+<a class="card" href="#residence" data-go="residence">
+  <div class="cardimg"><img src="img/residence-01.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">莫札特故居 Mozart-Wohnhaus</span><h3>走進莫札特的家</h3><p>莫札特一家住了二十多年的家。從全家福牆上的母親，到一封寫給父親的信，再到維也納的十年與身後的故事。</p><span class="meta">約 21 分鐘 · 18 張照片</span></div></a>
+<a class="card" href="#birthplace" data-go="birthplace">
+  <div class="cardimg"><img src="img/birthplace-01.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">莫札特出生地 Mozarts Geburtshaus</span><h3>糧食胡同 9 號：莫札特出生的地方</h3><p>糧食胡同 9 號的黃色大樓，莫札特 1756 年在這裡出生。小提琴、鋼琴與黑絨枕上的小物，還有他是個怎樣的人。</p><span class="meta">約 12 分鐘 · 11 張照片</span></div></a>
+<a class="card" href="#fortress" data-go="fortress">
+  <div class="cardimg"><img src="img/fortress-02.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">霍亨薩爾斯堡要塞 Festung Hohensalzburg</span><h3>霍亨薩爾斯堡要塞與「白色黃金」</h3><p>九百多年的教會要塞。鹽的財富、牢房、萊納團的戰史、1731 年被驅逐的新教徒，以及最頂樓的全景。</p><span class="meta">約 17 分鐘 · 15 張照片</span></div></a>
+<a class="card" href="#church" data-go="church">
+  <div class="cardimg"><img src="img/church-01.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">大學教堂 Kollegienkirche</span><h3>薩爾斯堡大學教堂</h3><p>舊城廣場邊一座純白的巴洛克教堂，為大學而蓋，也經歷過戰爭與修復。</p><span class="meta">約 2 分鐘 · 1 張照片</span></div></a>
+<a class="card" href="#moderne" data-go="moderne">
+  <div class="cardimg"><img src="img/moderne-06.jpg" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">現代美術館 Museum der Moderne</span><h3>薩爾斯堡現代美術館：山上的現代藝術</h3><p>僧侶山上的現代美術館。新即物主義展裡的鐵路看守人、被禁止的畫家，還有暴風雨前的博登湖。</p><span class="meta">約 10 分鐘 · 11 張照片</span></div></a>
+    </div>
+  </section>
+
+  <section class="trip">
+    <div class="triphead"><h2>旅途影片</h2><span>我們拍下的片段</span></div>
+    <div class="fbgrid">
+    <figure class="vid"><video controls playsinline preload="none" poster="vid/v2.jpg" src="vid/v2.mp4"></video><figcaption><b>山間小村</b><br>11 月 20 日。雲和山谷之間的房子與小路（地點待確認）</figcaption></figure>
+    <figure class="vid"><video controls playsinline preload="none" poster="vid/v4.jpg" src="vid/v4.mp4"></video><figcaption><b>城堡與遠山</b><br>山頂的城堡塔樓與雪山（地點待確認，可能是薩爾斯堡要塞）</figcaption></figure>
+    </div>
+  </section>
+  <p class="next">下一個地方還在路上，走到哪裡，就記到哪裡。</p>
+</section>
+<article class="post" id="view-koenigssee" hidden>
+  <header class="posthead"><span class="place">國王湖 Königssee</span><h1>國王湖：湖邊的步道，和新認識的朋友</h1><p class="meta">2026 年 11 月 19 日 · 德國・國王湖 · 約 8 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="koenigssee-s1">一、從老車站走向湖：湖濱街</button></li><li><button type="button" data-scroll="koenigssee-s2">二、一座只准電動船的湖</button></li><li><button type="button" data-scroll="koenigssee-s3">三、步道、觀景台與那座紅頂小教堂</button></li><li><button type="button" data-scroll="koenigssee-s4">四、鹽、主教與一條看不見的邊界</button></li><li><button type="button" data-scroll="koenigssee-s5">五、宜恩：第二天認識的朋友</button></li><li><button type="button" data-scroll="koenigssee-s6">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>國王湖旁的健行步道。這趟旅行的第二天，我們認識了來自馬來西亞的交換生宜恩，一起走了這段行程，一起享受旅行的樂趣。</p>
+<p>國王湖在德國，不在奧地利，但離薩爾斯堡很近，只隔著一條國界。我們這一天的路線，是從湖邊的小鎮一路走到步道上的觀景台。這一篇照例先把查到的歷史放在前面，再放上我們的照片，最後留給宜恩一個位置。</p>
+<h2 id="koenigssee-s1">一、從老車站走向湖：湖濱街</h2>
+<p>國王湖北岸的小鎮屬於舒瑙（Schönau am Königssee）。湖的北岸很窄，是整個湖唯一能走到水邊的地方，所以早早就蓋起了房子。從以前的車站（Königsseer Bahnhof）一直通到湖邊的這條路，叫做湖濱街（Seestraße），現在是行人專用的步行街，沿路有商店、餐館和老建築。街中央的廣場上立著一座方尖碑，是 1911 年為慶祝攝政王呂特波德九十歲生日所立。</p>
+<figure class="portrait"><img src="img/koenigssee-01.jpg" width="1050" height="1400" loading="lazy" alt="一棟有小鐘樓的老房子，旁邊的旗幟寫著 Romy Schneider 的名字（建築與旗幟的地點待確認，可能是老車站一帶）"><figcaption>一棟有小鐘樓的老房子，旁邊的旗幟寫著 Romy Schneider 的名字（建築與旗幟的地點待確認，可能是老車站一帶）</figcaption></figure>
+<p>這個小鎮還有一位名人。羅密・施奈德（Romy Schneider）1938 年生於維也納，她的母親瑪格達・施奈德（Magda Schneider）在 1935 年於舒瑙買下了「瑪麗恩格倫特」（Mariengrund）這棟房子，羅密和弟弟就在這裡長大；她後來也曾在薩爾斯堡附近的戈爾登斯坦（Goldenstein）寄宿學校念書，1955 年第一部《茜茜公主》電影上映，讓她一夜成了國際明星。舒瑙現在有一個常設展覽，叫做「一位世界巨星回家了」（Ein Weltstar kehrt heim）。路邊那面旗幟上印著一位女子的畫像和 Romy Schneider 的名字，應該就是這個展覽的宣傳旗，不過我們沒有進去看，這點先記下來。</p>
+<figure class="portrait"><img src="img/koenigssee-02.jpg" width="1050" height="1400" loading="lazy" alt="太太站在湖濱街的石板路上，背後是「Hotel Schiffmeister」；遠處的方尖碑看起來就是 1911 年那一座（待確認）"><figcaption>太太站在湖濱街的石板路上，背後是「Hotel Schiffmeister」；遠處的方尖碑看起來就是 1911 年那一座（待確認）</figcaption></figure>
+<p>「Hotel Schiffmeister」的牆面特別好看：窗戶周圍畫了華麗的花邊框，窗與窗之間畫著一位穿著傳統服裝、坐在小船上划槳的女子。這種畫在牆上的裝飾，叫做「Lüftlmalerei」，是上巴伐利亞與蒂羅爾一帶的民間壁畫，源自巴洛克時期、用畫的方式「假裝」成建築上的窗框與壁龕，十八世紀開始在阿爾卑斯山腳下流行，富有的商人、農民和工匠，用漂亮的牆面展示自己的家境。名稱的由來有幾種說法，常被提到的一種，是奧伯阿默高畫家茨溫克（Franz Seraph Zwinck）的房子叫做「Zum Lüftl」。這一面牆畫的是湖上的船，正好說明了這個地方的生活。</p>
+<figure class="portrait"><img src="img/koenigssee-03.jpg" width="1050" height="1400" loading="lazy" alt="「Hotel Schiffmeister」牆面的壁畫：花邊窗框，中間是划著小船的女子（壁畫內容待確認）"><figcaption>「Hotel Schiffmeister」牆面的壁畫：花邊窗框，中間是划著小船的女子（壁畫內容待確認）</figcaption></figure>
+<blockquote class="verse"><p>凡事都有定期，天下萬務都有定時。</p><cite>傳道書 3:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>從車站到湖邊，一條路上有皇家的方尖碑、電影明星的童年、畫在牆上的小船。時間在這條街上疊了好幾層，而我們只是剛好在十一月的早晨走過。</p></aside>
+<h2 id="koenigssee-s2">二、一座只准電動船的湖</h2>
+<p>國王湖長約八公里，最深的地方將近一百九十公尺，四周是貝希特斯加登阿爾卑斯山，大部分的湖屬於貝希特斯加登國家公園。湖邊沒有環湖的公路，要去對岸的景點，主要是搭船。</p>
+<p>自 1909 年起，湖上只准電動船行駛：那年 7 月 15 日，西門子—舒克特公司製造的電動船「Accumulator」開始載客，能載 38 人，長 12 公尺、寬 2.15 公尺，船身與船艙都用桃花心木做成。在這之前，湖上唯一的交通工具是划船。今天湖上有 19 艘電動船，電池晚上充電，白天不必再充。我們也搭上了這樣的船，一路坐到對岸的聖巴多羅買教堂，那一段另外寫成下一篇。</p>
+<figure class="landscape"><img src="img/koenigssee-04.jpg" width="1400" height="1050" loading="lazy" alt="太太站在碼頭邊；背後的霧貼著山腰，湖水在霧下呈綠色"><figcaption>太太站在碼頭邊；背後的霧貼著山腰，湖水在霧下呈綠色</figcaption></figure>
+<blockquote class="verse"><p>地的深處在他手中；山的高峰也屬他。海洋屬他，是他造的；旱地也是他手造成的。</p><cite>詩篇 95:4-5（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>湖邊不吵，船也不吵。為了保護一片水，人們在一百多年前就決定讓船安靜下來，這是我們很少想到的事。</p></aside>
+<h2 id="koenigssee-s3">三、步道、觀景台與那座紅頂小教堂</h2>
+<p>離開湖邊的小鎮，我們沿著步道往上走。走到半山腰，回頭可以看見碼頭一帶的屋頂，和湖邊的小鎮；再往前，樹林中有一座木頭欄杆的觀景台，湖水像一條長長的峽灣，一直通到雪白的群山。這樣的畫面，很像是步道上的「畫家角」（Malerwinkel）：它在湖的北岸，是一個很受歡迎的觀景點，視線可以越過湖面，看到聖巴多羅買教堂和遠處的尖頂群峰。不過我們沒有查到我們站的位置的路標，所以先寫「可能是」。</p>
+<figure class="landscape"><img src="img/koenigssee-05.jpg" width="1400" height="1050" loading="lazy" alt="太太在步道邊：背後是霧中的山尖、鋪著金屬板的屋頂和湖濱的小鎮"><figcaption>太太在步道邊：背後是霧中的山尖、鋪著金屬板的屋頂和湖濱的小鎮</figcaption></figure>
+<figure class="landscape"><img src="img/koenigssee-06.jpg" width="1400" height="788" loading="lazy" alt="從步道往下看：一片灰黑色的屋頂，後面是綠色的湖水、草坡和雲霧裡的山"><figcaption>從步道往下看：一片灰黑色的屋頂，後面是綠色的湖水、草坡和雲霧裡的山</figcaption></figure>
+<p>湖中那座白牆紅頂的教堂，是聖巴多羅買（St. Bartholomä）朝聖教堂，在湖的半途，從岸邊走過去非常遠，主要靠船到達。它原本是貝希特斯加登修道院領主們的夏季住所，後來成為巴伐利亞國王的狩獵行宮。</p>
+<figure class="portrait"><img src="img/koenigssee-07.jpg" width="1050" height="1400" loading="lazy" alt="我們兩個人背對鏡頭，站在欄杆邊看湖：左邊一團雲貼在山腰，遠處的山頂有雪"><figcaption>我們兩個人背對鏡頭，站在欄杆邊看湖：左邊一團雲貼在山腰，遠處的山頂有雪</figcaption></figure>
+<figure class="landscape"><img src="img/koenigssee-08.jpg" width="1400" height="788" loading="lazy" alt="木欄杆前的合照：背景是湖、峽谷，和遠處山頭的薄雪"><figcaption>木欄杆前的合照：背景是湖、峽谷，和遠處山頭的薄雪</figcaption></figure>
+<blockquote class="verse"><p>諸天述說神的榮耀；穹蒼傳揚他的手段。</p><cite>詩篇 19:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>我們站在這裡，沒有說很多話。霧一下子遮住山、一下子又散開，我們只是看著，這就夠了。</p></aside>
+<h2 id="koenigssee-s4">四、鹽、主教與一條看不見的邊界</h2>
+<p>國王湖屬於巴伐利亞，不過我們兩天後登上的薩爾斯堡要塞，和這裡其實有一段共同的歷史，就是鹽。</p>
+<p>在 1803 年以前，貝希特斯加登並不屬於巴伐利亞，而是一個叫「貝希特斯加登侯爵修道院領地」（Fürstpropstei Berchtesgaden）的小邦：它是神聖羅馬帝國直屬的諸侯國，由修道院的首席司鐸統治，領地幾乎被薩爾斯堡大主教國包圍。十二世紀末，貝希特斯加登和薩爾斯堡就曾因為鹽礦的開採起過爭執。兩邊都靠鹽致富，也因此常常為了邊界吵架。</p>
+<p>1803 年 2 月 11 日，最後一位首席司鐸，施羅芬貝格（Joseph Konrad von Schroffenberg）簽署了退位文件，同一天，薩爾斯堡大主教科羅雷多（Hieronymus Colloredo）也在拿破崙戰爭與教會領地世俗化的壓力下，辭去了世俗統治者的身分，兩個教會領地同時結束。貝希特斯加登先是併入薩爾斯堡選侯國，1805 年隨薩爾斯堡一起歸奧地利，1810 年再割讓給巴伐利亞；從那時起，國王湖一帶成了皇家狩獵場，聖巴多羅買也成了狩獵行宮。</p>
+<p>我們後來在要塞看到的「白色黃金」、牆上的那些主教，和這一天看到的湖，其實是同一片山、同一段歷史的不同角落。</p>
+<blockquote class="verse"><p>地和其中所充滿的，世界和住在其間的，都屬耶和華。</p><cite>詩篇 24:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>國界、領地、主教、國王，都會換。湖還是這一個湖，山還是這一座山。這句經文，我們讀起來特別有重量。</p></aside>
+<h2 id="koenigssee-s5">五、宜恩：第二天認識的朋友</h2>
+<p>這趟旅行的第二天，我們認識了來自馬來西亞的交換生宜恩。之後的行程，我們一起走，一起拍照、一起笑。</p>
+<figure class="landscape"><img src="img/koenigssee-09.jpg" width="1400" height="1050" loading="lazy" alt="在碼頭的自拍：宜恩、太太和我；後面有穿著迷彩軍服、戴著紅色貝雷帽的人走過（人物與單位待確認）"><figcaption>在碼頭的自拍：宜恩、太太和我；後面有穿著迷彩軍服、戴著紅色貝雷帽的人走過（人物與單位待確認）</figcaption></figure>
+<figure class="landscape"><img src="img/koenigssee-10.jpg" width="1400" height="1050" loading="lazy" alt="觀景台上的自拍：宜恩、我和太太，後面是國王湖"><figcaption>觀景台上的自拍：宜恩、我和太太，後面是國王湖</figcaption></figure>
+<blockquote class="verse"><p>不可忘記用愛心接待客旅；因為曾有接待客旅的，不知不覺就接待了天使。</p><cite>希伯來書 13:2（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>宜恩和我們一樣，都是離開家的人。在別人的國家裡遇見同樣來自亞洲的年輕人，一起走一段路，這是旅行送給我們的禮物。</p></aside>
+<h2 id="koenigssee-s6">旅人小記</h2>
+<figure class="portrait"><img src="img/koenigssee-11.jpg" width="787" height="1400" loading="lazy" alt="超市冷藏櫃裡一排排用保鮮膜包好的長麵包三明治，上方是蛋糕；標籤上有 SPAR 的字樣，上山前補給用"><figcaption>超市冷藏櫃裡一排排用保鮮膜包好的長麵包三明治，上方是蛋糕；標籤上有 SPAR 的字樣，上山前補給用</figcaption></figure>
+<ul><li>國王湖離薩爾斯堡不遠；船班、票價與停靠站（如聖巴多羅買）請以官方網站為準：seenschifffahrt.de。</li><li>十一月的國王湖多霧，山上已經有雪；我們戴著帽子、穿著羽絨外套，走起路來還是很暖。</li><li>這一篇還有幾處待確認：觀景台是不是畫家角、旗幟與建築的地點、湖濱街壁畫的內容、碼頭上軍人的單位。</li></ul>
+<p class="refs">參考資料：seenschifffahrt.de（Bayerische Seenschifffahrt 的歷史與船隊）、berchtesgaden.de（Seestraße、Romy Schneider Ausstellung、Der Königssee）、komoot（Königssee 景點與 Malerwinkel）、germansights.com（Königssee）、Wikipedia〈Berchtesgaden Provostry〉〈Lüftlmalerei〉〈Electorate of Salzburg〉、Bayern.travel 與 Ammergauer Alpen（Lüftlmalerei）、zobodat.at（貝希特斯加登侯爵修道院的紋章與 1803 年世俗化）、archivportal-d.de（Fürstpropstei Berchtesgaden）。</p>
+<nav class="pn"><span></span><a class="r" href="#bartholomae" data-go="bartholomae"><small>下一篇</small>聖巴多羅買教堂：湖上的紅色洋蔥頂</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-bartholomae" hidden>
+  <header class="posthead"><span class="place">聖巴多羅買教堂 St. Bartholomä</span><h1>聖巴多羅買教堂：湖上的紅色洋蔥頂</h1><p class="meta">2026 年 11 月 19 日 · 德國・國王湖 · 約 6 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="bartholomae-s1">一、搭船去對岸</button></li><li><button type="button" data-scroll="bartholomae-s2">二、1134 年的教堂與狩獵行宮</button></li><li><button type="button" data-scroll="bartholomae-s3">三、祭壇與聖巴多羅買</button></li><li><button type="button" data-scroll="bartholomae-s4">四、像牆一樣的山</button></li><li><button type="button" data-scroll="bartholomae-s5">影片</button></li><li><button type="button" data-scroll="bartholomae-s6">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>國王湖的紅色洋蔥頂教堂，是我們這一天最想看的風景。從湖邊的小鎮搭船過去，湖水慢慢從綠色變成灰藍色，兩邊的山壁越來越高，最後，一座白牆、紅頂的小教堂，出現在一片黃色落葉松前面。</p>
+<h2 id="bartholomae-s1">一、搭船去對岸</h2>
+<p>國王湖沒有環湖公路，要到對岸的聖巴多羅買（St. Bartholomä），一般人都是搭船：從湖邊的碼頭單程大約 35 分鐘。夏天可以再往前坐到更深處的薩列特（Salet），不過那一站只在復活節到十月中旬開，十一月就只到聖巴多羅買。船都是電動的，從 1909 年起就是這樣。</p>
+<p>船開了大約二十分鐘，船長通常會把船停下來，吹一段小號或圓號，讓大家聽山壁傳回來的回音。這個「國王湖的回音」很有名，據說最多可以聽到七次。我們這一趟聽到了幾次，之後再補。</p>
+<figure class="landscape"><img src="img/bartholomae-01.jpg" width="1400" height="1050" loading="lazy" alt="還停在碼頭時的船上自拍：宜恩、我和太太；窗外是碼頭邊的黑色木屋頂和黃旗，船艙裡貼著救生圈與逃生錘的標示"><figcaption>還停在碼頭時的船上自拍：宜恩、我和太太；窗外是碼頭邊的黑色木屋頂和黃旗，船艙裡貼著救生圈與逃生錘的標示</figcaption></figure>
+<figure class="landscape"><img src="img/bartholomae-02.jpg" width="1400" height="1050" loading="lazy" alt="船尾的藍白旗（巴伐利亞的顏色，待確認）；遠處兩山之間的湖面上，有一小片白色的建築，是我們要去的地方"><figcaption>船尾的藍白旗（巴伐利亞的顏色，待確認）；遠處兩山之間的湖面上，有一小片白色的建築，是我們要去的地方</figcaption></figure>
+<figure class="landscape"><img src="img/bartholomae-03.jpg" width="1400" height="1050" loading="lazy" alt="另一艘電動船從對岸駛過：紅木的船緣、白色的船身，後面是黃色與橘紅色的山坡"><figcaption>另一艘電動船從對岸駛過：紅木的船緣、白色的船身，後面是黃色與橘紅色的山坡</figcaption></figure>
+<blockquote class="verse"><p>耶和華在高處大有能力，勝過諸水的響聲，洋海的大浪。</p><cite>詩篇 93:4（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>船很安靜，只有水聲和旁邊人說話的聲音。這樣的湖，好像不需要誰吵著說「我很大」，山壁一直圍著它，它就是這樣大。</p></aside>
+<h2 id="bartholomae-s2">二、1134 年的教堂與狩獵行宮</h2>
+<p>聖巴多羅買教堂建在一個叫「希爾紹」（Hirschau）的半島上，這個半島是河水多少年來衝下來的碎石堆出來的，大約有 85 公頃，只有船能到。教堂最早在 1134 年，由貝希特斯加登的侯爵修道院（前一篇提過的那個小邦）蓋在一座更小的舊建築原址上。因為這裡可以打獵，旁邊後來也蓋了修道院領主的狩獵行宮。</p>
+<p>現在看到的教堂，是 1697 到 1698 年重建的，屬於巴洛克式。從照片看，它有幾個圓圓的紅色屋頂，加上兩座白色的塔樓，塔頂是兩個大小不同的洋蔥頂。1803 年修道院領地結束、1810 年轉給巴伐利亞之後，這裡成了王室的狩獵行宮，教堂旁邊的老房子，現在是一間餐廳。旁邊還有一個國王湖的漁場：這裡捕魚的歷史，可以追溯到 1160 年，當時燻過的紅點鮭（Saibling）就從國王湖運到義大利北部；對修道院來說，因為教會一年有很多齋戒日，魚也是很重要的收入。</p>
+<figure class="landscape"><img src="img/bartholomae-04.jpg" width="1400" height="788" loading="lazy" alt="從湖上遠看聖巴多羅買教堂：紅色圓頂與兩座白塔，左邊是灰色木牆的小屋，右邊是以前的狩獵行宮"><figcaption>從湖上遠看聖巴多羅買教堂：紅色圓頂與兩座白塔，左邊是灰色木牆的小屋，右邊是以前的狩獵行宮</figcaption></figure>
+<figure class="portrait"><img src="img/bartholomae-05.jpg" width="1050" height="1400" loading="lazy" alt="半島岸邊的小路：教堂與旁邊的老房子貼著山腳，湖水很清，岸邊堆著一圈落葉"><figcaption>半島岸邊的小路：教堂與旁邊的老房子貼著山腳，湖水很清，岸邊堆著一圈落葉</figcaption></figure>
+<figure class="portrait"><img src="img/bartholomae-06.jpg" width="1050" height="1400" loading="lazy" alt="近看教堂：紅色的鱗片屋頂已長了青苔，白色的塔身、黃色的窗框，還有背後金黃色的落葉松"><figcaption>近看教堂：紅色的鱗片屋頂已長了青苔，白色的塔身、黃色的窗框，還有背後金黃色的落葉松</figcaption></figure>
+<blockquote class="verse"><p>主啊，你世世代代作我們的居所。</p><cite>詩篇 90:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>同一個地方，九百年前是修道院的教堂，後來是國王的行宮，現在是我們這樣的旅人來看的風景。房子換了很多主人，但是人來這裡抬頭看山的心，大概一直沒變。</p></aside>
+<h2 id="bartholomae-s3">三、祭壇與聖巴多羅買</h2>
+<p>教堂的名字來自使徒巴多羅買（Bartholomäus），他是阿爾卑斯山區農民與乳農的守護聖人，高壇上的畫面是他，每年 8 月 24 日前後，這裡會有朝聖。教堂裡面白色的牆上，有淡粉色的灰泥浮雕；祭壇則像是另一個世界：深紅色的豹斑紋圓柱、金色的捲葉、中間一幅暗色的大畫。</p>
+<figure class="portrait"><img src="img/bartholomae-07.jpg" width="1050" height="1400" loading="lazy" alt="教堂內部的高壇：紅色豹斑紋圓柱與金色雕飾，中間的畫據說是聖巴多羅買（畫的內容待確認）；兩側的窗讓白色牆面特別亮"><figcaption>教堂內部的高壇：紅色豹斑紋圓柱與金色雕飾，中間的畫據說是聖巴多羅買（畫的內容待確認）；兩側的窗讓白色牆面特別亮</figcaption></figure>
+<blockquote class="verse"><p>萬軍之耶和華啊，你的居所何等可愛！</p><cite>詩篇 84:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>從湖邊的冷風走進來，裡面很靜，牆壁是白色的，祭壇是深紅色的。這麼偏遠的地方，也有人蓋起這麼用心的房子，這是我們很少想到的事。</p></aside>
+<h2 id="bartholomae-s4">四、像牆一樣的山</h2>
+<p>教堂背後的那面大山壁，是瓦茨曼山（Watzmann）的東壁。瓦茨曼山高 2,713 公尺，是完全在德國境內最高的山；東壁從國王湖邊一直往上到南峰，落差約 1,800 公尺，是東阿爾卑斯山最長的連續岩壁，因為登山口就在聖巴多羅買教堂後面，也被叫做「巴多羅買壁」。我們那天看到的，是被雲遮住上半截的山壁，上面灑著一層薄薄的新雪。</p>
+<p>當地還有一個「瓦茨曼國王」的傳說：很久以前，有個殘忍的國王叫瓦茨曼，跟他的妻子與七個孩子，因為做惡，被上帝變成了石頭，就是現在的瓦茨曼山、小瓦茨曼山和山邊的幾座「孩子山」，他們的血流到山谷，變成了兩座湖，比較大的那座叫國王湖。</p>
+<figure class="portrait"><img src="img/bartholomae-08.jpg" width="1050" height="1400" loading="lazy" alt="半島上的老栗子樹與長椅，背後是被雲遮住上半截、落了薄雪的岩壁（可能是瓦茨曼東壁，待確認）"><figcaption>半島上的老栗子樹與長椅，背後是被雲遮住上半截、落了薄雪的岩壁（可能是瓦茨曼東壁，待確認）</figcaption></figure>
+<figure class="portrait"><img src="img/bartholomae-09.jpg" width="1050" height="1400" loading="lazy" alt="同一個地方換個角度：樹枝上掛著一串燈泡，遠處的岩壁一層一層，像是用刀切出來的"><figcaption>同一個地方換個角度：樹枝上掛著一串燈泡，遠處的岩壁一層一層，像是用刀切出來的</figcaption></figure>
+<figure class="portrait"><img src="img/bartholomae-10.jpg" width="1050" height="1400" loading="lazy" alt="長椅上，太太靠著我的肩膀，一起看對岸的山；左邊遠處有一座尖尖的山頭（地點待確認）"><figcaption>長椅上，太太靠著我的肩膀，一起看對岸的山；左邊遠處有一座尖尖的山頭（地點待確認）</figcaption></figure>
+<blockquote class="verse"><p>諸山未曾生出，地與世界你未曾造成，從亙古到永遠，你是神。</p><cite>詩篇 90:2（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>傳說說這些山是人變成的。我們看著，只覺得它們比故事老得多，比我們想過的任何事都更老。我們坐在長椅上，覺得自己很小，也覺得被好好地放在這裡。</p></aside>
+<h2 id="bartholomae-s5">影片</h2>
+<div class="vidrow"><figure class="vid"><video controls playsinline preload="none" poster="vid/v1.jpg" src="vid/v1.mp4"></video><figcaption><b>從湖上看聖巴多羅買教堂</b><br>11 月 19 日。紅色洋蔥頂的教堂與湖（地點依畫面判斷）</figcaption></figure><figure class="vid"><video controls playsinline preload="none" poster="vid/v3.jpg" src="vid/v3.mp4"></video><figcaption><b>船上的窗景</b><br>船上看著窗外的山與湖</figcaption></figure></div>
+<h2 id="bartholomae-s6">旅人小記</h2>
+<ul><li>船班、票價與停靠站請以官方網站為準：seenschifffahrt.de。十一月湖上的船只到聖巴多羅買，來回算上停留，至少要留 2 個小時。</li><li>教堂旁的老房子（以前的狩獵行宮）現在是餐廳，旁邊還有漁場的小吃店；岸邊的栗子樹下有戶外座位。</li><li>這一篇還有幾處待確認：船上有沒有聽到回音、祭壇畫的內容、長椅與岩壁的位置、船尾旗幟的種類。</li></ul>
+<p class="refs">參考資料：bayernportal.de 與 berchtesgaden.de（Wallfahrtskirche St. Bartholomä、Der Königssee、Watzmann Ostwand、Die Watzmann-Sage、Fischerei Königssee）、Wikipedia〈St. Bartholomew’s Church, Berchtesgaden〉〈Watzmann〉〈Königssee〉、salzburg.info（Königssee Schifffahrt）、seenschifffahrt.de（船班與歷史）、wikiwand〈Königssee〉。</p>
+<nav class="pn"><a href="#koenigssee" data-go="koenigssee"><small>上一篇</small>國王湖：湖邊的步道，和新認識的朋友</a><a class="r" href="#ramsau" data-go="ramsau"><small>下一篇</small>拉姆紹教堂：霧裡的洋蔥頂</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-ramsau" hidden>
+  <header class="posthead"><span class="place">拉姆紹教堂 Ramsau St. Sebastian</span><h1>拉姆紹教堂：霧裡的洋蔥頂</h1><p class="meta">2026 年 11 月 19 日 · 德國・國王湖 · 約 7 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="ramsau-s1">一、搭公車到山谷裡的小村</button></li><li><button type="button" data-scroll="ramsau-s2">二、1512 年的教堂與洋蔥頂</button></li><li><button type="button" data-scroll="ramsau-s3">三、小溪邊的畫家角度</button></li><li><button type="button" data-scroll="ramsau-s4">四、墓園與兩個名字</button></li><li><button type="button" data-scroll="ramsau-s5">五、牆上的日晷</button></li><li><button type="button" data-scroll="ramsau-s6">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>拉姆紹（Ramsau，也常被寫成蘭紹、藍紹）的聖塞巴斯蒂安教堂，是巴伐利亞最有名的教堂之一。那天下午，山全都藏在雲裡，只剩下一座白牆、黑色洋蔥頂的小教堂，坐在溪邊的小坡上。沒有藍天，反而更像一幅老畫。</p>
+<h2 id="ramsau-s1">一、搭公車到山谷裡的小村</h2>
+<p>拉姆紹是貝希特斯加登旁邊的一個山谷小村，地名最早出現在 1295 年的文獻裡，現在是德國第一個獲得「登山者村」（Bergsteigerdorf）稱號的社區。官方資料說，從貝希特斯加登可以搭 845 或 846 線公車到教堂，我們這一趟就是搭公車上山谷的（路線待確認）。</p>
+<figure class="landscape"><img src="img/ramsau-01.jpg" width="1100" height="825" loading="lazy" alt="公車上的自拍：我和太太，窗外是飛快掠過的樹林與紅褐色的落葉山坡"><figcaption>公車上的自拍：我和太太，窗外是飛快掠過的樹林與紅褐色的落葉山坡</figcaption></figure>
+<figure class="landscape"><img src="img/ramsau-02.jpg" width="1100" height="825" loading="lazy" alt="進村路邊的房子：白牆、深紅木頭陽台，後面是被雲壓低的杉林（牆上似乎寫著 Haus Cäcilia，待確認）"><figcaption>進村路邊的房子：白牆、深紅木頭陽台，後面是被雲壓低的杉林（牆上似乎寫著 Haus Cäcilia，待確認）</figcaption></figure>
+<blockquote class="verse"><p>我要向山舉目；我的幫助從何而來？</p><cite>詩篇 121:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>山今天不給我們看。可是我們還是抬頭看了，也知道它們在雲後面。有些事情看不到，不代表它不在，這好像是這一趟旅行一直在教我們的。</p></aside>
+<h2 id="ramsau-s2">二、1512 年的教堂與洋蔥頂</h2>
+<p>教堂從 1512 年開始蓋，是貝希特斯加登侯爵修道院的院長格雷戈爾・萊納（Gregor Rainer）任內蓋的，獻給聖塞巴斯蒂安和聖法比安。它蓋在一條老商路上：從貝希特斯加登往奧地利方向、翻過希爾施比赫爾山口（Hirschbichlpass）的路，是運鹽、運酒的馱獸隊伍經過的地方。教堂旁邊的 Oberwirt 餐館，前身就是修道院在 1500 年左右為運鹽人和車夫蓋的落腳處。鹽的故事，在薩爾斯堡的要塞和國王湖都出現過，沒想到在這個山谷小村又遇到了。</p>
+<p>最早的教堂是比較窄的晚期哥德式，後來一再擴建，17 世紀末改成巴洛克風格（資料有 1692 年和 1697 到 1699 年兩種說法），1700 年前後蓋了現在這座有洋蔥頂的塔，屋頂和塔都鋪著木瓦。拉姆紹在 1812 年才成為獨立的教區，這座教堂這時才升格為教區教堂。在這之前，它大約有一百五十年是由貝希特斯加登派人照顧的。</p>
+<p>教堂裡面有一排基督與十二使徒的彩繪木雕，年代約 1420 到 1430 年，比教堂本身還老；高壇上的早期巴洛克祭壇畫，畫的是聖塞巴斯蒂安殉道。我們這次沒有拍到教堂內部，有沒有進去看，之後再補。</p>
+<figure class="landscape"><img src="img/ramsau-03.jpg" width="1100" height="825" loading="lazy" alt="沿著上坡的馬路走向教堂：灰黑色的木瓦屋頂、白牆、洋蔥頂的塔，南牆上有一個圓形的日晷"><figcaption>沿著上坡的馬路走向教堂：灰黑色的木瓦屋頂、白牆、洋蔥頂的塔，南牆上有一個圓形的日晷</figcaption></figure>
+<figure class="landscape"><img src="img/ramsau-04.jpg" width="1100" height="825" loading="lazy" alt="馬路邊的白色長牆，應該是墓園的外牆；塔尖在霧裡只剩下深色的剪影，右邊是長滿草的山坡"><figcaption>馬路邊的白色長牆，應該是墓園的外牆；塔尖在霧裡只剩下深色的剪影，右邊是長滿草的山坡</figcaption></figure>
+<blockquote class="verse"><p>若不是耶和華建造房屋，建造的人就枉然勞力。</p><cite>詩篇 127:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>五百多年前，有人在運鹽的路旁蓋了一間教堂，旁邊就是給路人休息的客棧。大概在那個時候，他們就已經知道，趕路的人也需要一個可以安靜的地方。</p></aside>
+<h2 id="ramsau-s3">三、小溪邊的畫家角度</h2>
+<p>教堂前的小溪是拉姆紹阿河（Ramsauer Ache），往上游走可以走到辛特湖（Hintersee）。站在溪邊看過去，溪水、木橋、教堂和遠處的山連成一幅畫，這個角度被叫做「畫家角」（Malerwinkel）：前景是拉姆紹阿河和 Ertlsteg 人行木橋，後面本來該是 Reiter Alm 山群。</p>
+<p>十九世紀有很多風景畫家來拉姆紹寫生，村子現在還有一條「畫家環形步道」，把畫家當年畫畫的地點串起來，教堂是其中的第 8 站；官方的小冊子上列著 Wilhelm Bendz 畫的《拉姆紹的教堂》和 Thomas Fearnley 1830 年畫的《拉姆紹》。我們那天看不到 Reiter Alm，也不確定自己站的位置是不是畫家角本身，這兩件事都待確認。</p>
+<figure class="landscape"><img src="img/ramsau-05.jpg" width="1100" height="825" loading="lazy" alt="沿著小溪往教堂走：溪水撞著石頭，岸邊是紅褐色的灌木，教堂的塔和黑屋頂從樹叢後面探出來"><figcaption>沿著小溪往教堂走：溪水撞著石頭，岸邊是紅褐色的灌木，教堂的塔和黑屋頂從樹叢後面探出來</figcaption></figure>
+<figure class="landscape"><img src="img/ramsau-06.jpg" width="1100" height="824" loading="lazy" alt="再靠近一點：白牆、黑屋頂、洋蔥頂，前面是木欄杆的小路，旁邊的山坡被雲蓋住了一半"><figcaption>再靠近一點：白牆、黑屋頂、洋蔥頂，前面是木欄杆的小路，旁邊的山坡被雲蓋住了一半</figcaption></figure>
+<figure class="portrait"><img src="img/ramsau-07.jpg" width="824" height="1100" loading="lazy" alt="直拍：教堂坐在溪邊的小坡上，塔上的鐘面與窗子很清楚"><figcaption>直拍：教堂坐在溪邊的小坡上，塔上的鐘面與窗子很清楚</figcaption></figure>
+<figure class="portrait"><img src="img/ramsau-08.jpg" width="824" height="1100" loading="lazy" alt="太太撐著黑色的傘站在木欄杆旁，背後就是教堂；那天一直下著小雨"><figcaption>太太撐著黑色的傘站在木欄杆旁，背後就是教堂；那天一直下著小雨</figcaption></figure>
+<figure class="portrait"><img src="img/ramsau-09.jpg" width="824" height="1100" loading="lazy" alt="沿著溪往遠處看：霧從山谷往上爬，遠處有另一座小木橋"><figcaption>沿著溪往遠處看：霧從山谷往上爬，遠處有另一座小木橋</figcaption></figure>
+<figure class="landscape"><img src="img/ramsau-10.jpg" width="1100" height="824" loading="lazy" alt="同一個地方橫拍：右邊是老樹和黃色的灌木，溪水又清又急"><figcaption>同一個地方橫拍：右邊是老樹和黃色的灌木，溪水又清又急</figcaption></figure>
+<blockquote class="verse"><p>他使我躺臥在青草地上，領我在可安歇的水邊。</p><cite>詩篇 23:2（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>水一直流，雨一直下，教堂就在那裡。我們撐著傘慢慢走，想起小時候不趕時間的下午，那種感覺好久沒有了。</p></aside>
+<h2 id="ramsau-s4">四、墓園與兩個名字</h2>
+<p>教堂四周是老墓園，從 1658 年就開始使用，在教堂的東邊。從鐵花格門進去，一條碎石小路一直通到教堂門口，兩邊是小屋頂的木十字架、鑄鐵十字架和有照片的墓碑。門樓的山牆上寫著 1897，下面有一幅壁畫，看起來是耶穌復活的畫面（待確認）；外牆上掛著幾個花圈，繫著藍白（巴伐利亞）和黑紅金（德國）的緞帶，緞帶上的字我們沒有全部看清楚，是哪一種紀念，待確認。</p>
+<p>這個墓園裡，有兩個名字特別有名。一個是約翰・格里爾（Johann Grill，外號 Kederbacher，1835 到 1917 年），被稱為德國第一位山地嚮導，1881 年 6 月 6 日他帶著奧托・許克（Otto Schück）第一次爬上瓦茨曼東壁，就是前一篇在聖巴多羅買教堂後面看到的那面大岩壁，他就葬在這裡。另一個是約瑟夫・莫爾（Josef Mohr），《平安夜》的作詞人，薩爾斯堡人，1815 年 8 月 29 日來到拉姆紹，這是他當上神父後的第一個工作，後來他和奧伯恩多夫的教堂風琴手合作寫了《平安夜》。他自己後來葬在奧地利的瓦格賴因，不是這裡，但這座教堂是他的第一站。</p>
+<figure class="portrait"><img src="img/ramsau-11.jpg" width="825" height="1100" loading="lazy" alt="墓園的門樓：山牆上寫著 1897，下面是一幅小壁畫，石頭拱門後面是鐵花格門和墓園；右邊的外牆掛著花圈"><figcaption>墓園的門樓：山牆上寫著 1897，下面是一幅小壁畫，石頭拱門後面是鐵花格門和墓園；右邊的外牆掛著花圈</figcaption></figure>
+<figure class="portrait"><img src="img/ramsau-12.jpg" width="825" height="1100" loading="lazy" alt="從門裡看進去：碎石小路通向白色的教堂，兩邊都是十字架和小小的花園，山谷的霧就在後面"><figcaption>從門裡看進去：碎石小路通向白色的教堂，兩邊都是十字架和小小的花園，山谷的霧就在後面</figcaption></figure>
+<blockquote class="verse"><p>耶穌對她說：復活在我，生命也在我；信我的人，雖然死了，也必復活。</p><cite>約翰福音 11:25（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>這裡的墓一座一座都收拾得很整齊，有花、有燈、有照片。看著它們，我們想到的不是離開，而是有人一直在照顧、一直在記得。</p></aside>
+<h2 id="ramsau-s5">五、牆上的日晷</h2>
+<p>教堂南牆上有一個畫出來的日晷：中間是一張有臉的太陽，下面是兩圈半圓形的刻度，一圈是羅馬數字，一圈是阿拉伯數字，靠影子報時。我們到的時候沒有太陽，所以也沒有影子，只剩下牆上畫著的那一圈圈數字。日晷旁邊的窗邊還有一塊小浮雕牌，內容待確認。</p>
+<figure class="portrait"><img src="img/ramsau-13.jpg" width="826" height="1100" loading="lazy" alt="南牆上的日晷：太陽臉下面是兩圈半圓形的刻度；牆下的石頭小路上，太太撐著傘抬頭看"><figcaption>南牆上的日晷：太陽臉下面是兩圈半圓形的刻度；牆下的石頭小路上，太太撐著傘抬頭看</figcaption></figure>
+<blockquote class="verse"><p>求你指教我們怎樣數算自己的日子，好叫我們得著智慧的心。</p><cite>詩篇 90:12（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>沒有太陽的日子，日晷不能報時。可是我們在那裡站了好一會兒，也沒有一個人看手錶。</p></aside>
+<h2 id="ramsau-s6">旅人小記</h2>
+<ul><li>交通：官方資料寫的是 RVO 公車 845 或 846 線，到教堂附近下車；班次請以當天的公車時刻表為準。</li><li>教堂與墓園：教堂的資料寫著「隨時可以進入」，但墓園是現在還有人在祭拜的地方，請放輕聲音，拍照也避開別人家的墓碑和前來祭拜的人。</li><li>附近還有昆特韋格朝聖教堂（Kunterwegkirche）和十字架之路，從教堂旁邊的路上去；這次我們沒有走，留給下一次。</li><li>這一篇還有幾處待確認：搭的公車路線、門樓壁畫的內容、花圈緞帶上的字、日晷旁的小浮雕、溪邊的位置是不是畫家角、教堂內部有沒有進去。</li></ul>
+<figure class="portrait"><img src="img/ramsau-14.jpg" width="824" height="1100" loading="lazy" alt="附記：11 月 20 日拍的紅葉樹，遠處有積雪的山，左邊是白色的房子與鐵路平交道，不確定是在哪裡拍的（待確認）"><figcaption>附記：11 月 20 日拍的紅葉樹，遠處有積雪的山，左邊是白色的房子與鐵路平交道，不確定是在哪裡拍的（待確認）</figcaption></figure>
+<p class="refs">參考資料：berchtesgaden.de（Kirche Ramsau、Kunterweg-Kirche）、ramsau.de（Pfarrkirche、Maler-Rundwanderweg 小冊子、Erlebnisweg 小冊子、Silent Night 頁面）、de.wikipedia〈St. Sebastian (Ramsau)〉、waymarking.com（Sundial on St Sebastian Church）、Historical Marker Database（Pfarrkirche St. Sebastian）、Deutsche Biographie（Johann Grill）、Alpenverein 圖書館（Kederbacher）、Find a Grave（Josef Mohr）。</p>
+<nav class="pn"><a href="#bartholomae" data-go="bartholomae"><small>上一篇</small>聖巴多羅買教堂：湖上的紅色洋蔥頂</a><a class="r" href="#residence" data-go="residence"><small>下一篇</small>走進莫札特的家</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-residence" hidden>
+  <header class="posthead"><span class="place">莫札特故居 Mozart-Wohnhaus</span><h1>走進莫札特的家</h1><p class="meta">2026 年 11 月 21 日 · 薩爾斯堡 · 約 21 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="residence-s1">一、先看位置：廣場模型與聖三一教堂</button></li><li><button type="button" data-scroll="residence-s2">二、莫札特全家福：牆上的母親</button></li><li><button type="button" data-scroll="residence-s3">三、一封寫給父親的信（1780 年 11 月 15 日）</button></li><li><button type="button" data-scroll="residence-s4">四、《魔笛》的源頭：一本 1789 年的童話集</button></li><li><button type="button" data-scroll="residence-s5">五、《魔笛》展間：羽毛與星空</button></li><li><button type="button" data-scroll="residence-s6">六、莫札特的鋼琴、義大利之旅與少年的友誼</button></li><li><button type="button" data-scroll="residence-s7">七、維也納的十年（1781–1791）</button></li><li><button type="button" data-scroll="residence-s8">八、病中的莫札特</button></li><li><button type="button" data-scroll="residence-s9">九、身後的莫札特：誰在說他的故事？</button></li><li><button type="button" data-scroll="residence-s10">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>十一月的薩爾斯堡早上，我和太太走過薩爾察赫河，來到馬卡特廣場 8 號。這裡不是莫札特出生的地方（出生地在對岸的糧食胡同 9 號），而是 1773 年全家搬來的「舞蹈教師之家」——一層有八個房間的寬敞公寓。莫札特從 17 歲住到離開薩爾斯堡，父親利奧波德則一直住到 1787 年過世。館內燈光昏黃，一件件手稿、畫作和樂器，像在低聲訴說這個家的故事。</p>
+<p>莫札特出生隔天，就在薩爾斯堡主座教堂受洗，洗禮名裡有一個「Theophilus」，希臘文的意思是「被神所愛的」，拉丁文寫作「Amadeus」——後來全世界都用這個名字記得他。帶著這個名字走進他的家，感覺格外不同。</p>
+<blockquote class="verse"><p>神造萬物，各按其時成為美好，又將永生安置在世人心裡。</p><cite>傳道書 3:11（和合本）</cite></blockquote>
+<h2 id="residence-s1">一、先看位置：廣場模型與聖三一教堂</h2>
+<p>展廳裡有一座老城模型，紅色小箭頭標著「Mozarts Wohnhaus」和「Theater」。中間那座綠色圓頂的巴洛克教堂是聖三一教堂（Dreifaltigkeitskirche），1694 年由巴洛克大師費舍爾・馮・埃爾拉赫設計。這片廣場莫札特那時叫「漢尼拔廣場」，故居正對面就是今天的州立劇院和米拉貝爾花園大門。</p>
+<p>也就是說，莫札特家門一開，抬頭就是一座獻給「聖父、聖子、聖靈」的教堂。今天看到的故居其實是重建的：原建築在二戰後拆除，後來依照舊圖重建，1996 年重新開幕。</p>
+<p>這棟房子的歷史可以追溯到 1617 年，1685 年以前其實是兩棟。1711 年起，宮廷舞蹈教師羅倫茲・史佩克納在這裡教貴族子弟跳舞——當時的舞蹈學校不只教跳舞，也教上流社會的禮儀，讓年輕貴族準備進入宮廷生活，「舞蹈教師之家」的名字由此而來。巧的是，他的兒子、接任宮廷舞蹈教師的法蘭茲・史佩克納，正是 1747 年莫札特父母結婚時的證婚人。</p>
+<p>1773 年，史佩克納過世六年後，莫札特一家搬進二樓這間八個房間的大公寓，包括原本用來上舞蹈課的大廳。莫札特從 17 歲住到 25 歲；父親則一直住到 1787 年 5 月 28 日過世，晚年還在這裡照顧南妮爾的長子。</p>
+<p>1944 年 10 月 16 日，一顆空襲炸彈摧毀了建築的三分之二。莫札特基金會 1955 年買下倖存的部分，1989 年又買下戰後蓋在廢墟上的辦公大樓，拆除後依照舊圖重建，1996 年 1 月 26 日——莫札特生日前一天——重新開幕。</p>
+<figure class="portrait"><img src="img/residence-01.jpg" width="1051" height="1400" loading="lazy" alt="館內的馬卡特廣場模型，紅箭頭標示莫札特故居與劇院"><figcaption>館內的馬卡特廣場模型，紅箭頭標示莫札特故居與劇院</figcaption></figure>
+<aside class="heart"><span>我們的感動</span><p>看著這座模型，我們想像兩百五十年前的莫札特，每天出門就看見教堂的圓頂、聽見鐘聲。信仰不是掛在牆上的裝飾，而是生活的地景。</p></aside>
+<h2 id="residence-s2">二、莫札特全家福：牆上的母親</h2>
+<p>這幅大油畫一般認為出自薩爾斯堡畫家德拉・克羅切之手，繪於 1780 年底到 1781 年初。畫中莫札特和姊姊南妮爾四手聯彈，父親利奧波德倚著琴、手持小提琴；背後橢圓畫框裡的，是 1778 年陪兒子旅行時在巴黎病逝的母親安娜・瑪麗亞。一家人用「畫中畫」的方式，讓她依然在場。</p>
+<p>莫札特在母親臨終時寫信回家，信裡一再提到要把一切交託在神的旨意裡。南妮爾日後也說，這幅畫裡的弟弟是最像本人的一張。</p>
+<p>這幅畫的背景其實很沉重。1777–1779 年，莫札特由母親陪同，到曼海姆和巴黎找工作，結果一無所獲；母親在巴黎病逝，他只能獨自回到薩爾斯堡，繼續為他不喜歡的科洛雷多大主教工作。所以畫中這一家三口加上牆上的母親，是一個剛經歷失去、彼此依靠的家庭。</p>
+<figure class="landscape"><img src="img/residence-02.jpg" width="1400" height="1051" loading="lazy" alt="莫札特全家福，約 1780–1781 年"><figcaption>莫札特全家福，約 1780–1781 年</figcaption></figure>
+<blockquote class="verse"><p>我們若信耶穌死而復活了，那已經在耶穌裡睡了的人，神也必將他與耶穌一同帶來。</p><cite>帖撒羅尼迦前書 4:14（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>站在這幅畫前，太太輕聲說：「媽媽雖然不在了，可是她還在這個家裡。」我們都想起了自己已經離開的家人。在基督裡，離別不是終點，這幅畫好像也在這樣盼望著。</p></aside>
+<h3>姊姊南妮爾</h3>
+<p>另一面牆上掛著一位頂著高聳髮型、胸前別著粉紅緞帶的年輕女子。這幅畫從 19 世紀起就被視為南妮爾的肖像，但館方也坦白，畫中人身分並不確定，所以稱它為「據稱」的南妮爾肖像，2017 年購入後才在故居展出。南妮爾自己也是出色的鍵盤演奏家，小時候和弟弟一起巡迴歐洲，長大後在薩爾斯堡教貴族千金彈琴。</p>
+<figure class="portrait"><img src="img/residence-03.jpg" width="1051" height="1400" loading="lazy" alt="據稱為南妮爾・莫札特的肖像"><figcaption>據稱為南妮爾・莫札特的肖像</figcaption></figure>
+<aside class="heart"><span>我們的感動</span><p>南妮爾的才華不輸弟弟，卻因為時代而留在幕後。我們很喜歡她畫裡帶點俏皮的眼神——默默陪伴、成全家人的人，在神眼中一樣是寶貴的。</p></aside>
+<h2 id="residence-s3">三、一封寫給父親的信（1780 年 11 月 15 日）</h2>
+<p>展品 40 是莫札特的親筆信。1780 年秋天，巴伐利亞選帝侯委託他寫正歌劇《伊多梅紐斯，克里特之王》（K. 366），他 11 月初到慕尼黑和歌手一起排練，並寫信向父親報告：</p>
+<ul><li>飾演國王的男高音拉夫年紀大了，想在第三幕最後唱一首好聽的詠嘆調取代四重唱。莫札特說他有道理，就算沒道理，也該「給他的白髮一點面子」。</li><li>對飾演王子的閹人歌手達爾・普拉托就沒那麼客氣，諷刺地稱他「我最親愛的閹人歌手」，抱怨得把整部歌劇一句句教給他。</li></ul>
+<p>《伊多梅紐斯》的故事很像舊約亞伯拉罕獻以撒：國王在海上遇難時向海神許願，平安上岸後要獻上第一個遇見的人，沒想到遇見的竟是自己的兒子。最後一個從天而來的聲音解除了誓約，兒子得以存活。這部歌劇在 1781 年 1 月 29 日於慕尼黑首演。</p>
+<p>這份委託來得正是時候。巴伐利亞選帝侯卡爾・特奧多爾熱愛音樂，他從曼海姆帶來的宮廷樂團被公認是當時歐洲最好的樂團，英國音樂史家伯尼形容它是「一支由將軍組成的軍隊」。1778 年他繼承巴伐利亞、把宮廷遷到慕尼黑，1780 年委託莫札特為嘉年華季寫新歌劇；劇本由薩爾斯堡大主教的宮廷神父瓦雷斯科撰寫，這份委託可能是信中提到的老男高音拉夫幫忙爭取來的。</p>
+<p>首演在慕尼黑王宮裡華麗的屈維利埃劇院舉行，總彩排那天正好是莫札特 25 歲生日。排練時選帝侯對他說：誰能相信這麼小的腦袋裡藏著這麼偉大的東西？有趣的是，當時唯一的報紙評論大讚布景，卻連作曲者的名字都沒提。幾個月後，莫札特就和科洛雷多大主教決裂，離開薩爾斯堡到維也納當自由音樂家。《伊多梅紐斯》因此被視為他第一部成熟的偉大歌劇，也是他告別故鄉的轉捩點。</p>
+<figure class="landscape"><img src="img/residence-04.jpg" width="1400" height="1051" loading="lazy" alt="莫札特 1780 年 11 月 15 日寫給父親的親筆信（展品 40）"><figcaption>莫札特 1780 年 11 月 15 日寫給父親的親筆信（展品 40）</figcaption></figure>
+<blockquote class="verse"><p>亞伯拉罕給那地方起名叫耶和華以勒。</p><cite>創世記 22:14（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>讀著這封信，我們看到的不是遙遠的天才，而是一個跟父親報告工作、對同事又尊重又抱怨的年輕人。他寫父子之間的獻祭與赦免，同時在信裡和自己的父親說心事——這份父子情，讓我們很感動。</p></aside>
+<h2 id="residence-s4">四、《魔笛》的源頭：一本 1789 年的童話集</h2>
+<p>展櫃裡攤開的是維蘭德編的童話集《金尼斯坦》第三冊，1789 年在瑞士溫特圖爾出版，翻開的正是〈露露，或魔笛〉。展牌說明，這篇故事成了席卡內德寫《魔笛》劇本的直接藍本。查資料時發現一個細節：學界普遍認為〈露露〉其實是維蘭德的女婿利伯斯金所寫，只是收錄在維蘭德的集子裡。</p>
+<p>《魔笛》是莫札特過世那年的作品，整部戲在講年輕人經過火與水的試煉，從黑夜走向光明。</p>
+<figure class="landscape"><img src="img/residence-05.jpg" width="1400" height="1051" loading="lazy" alt="維蘭德《金尼斯坦》第三冊，翻開的是〈露露，或魔笛〉"><figcaption>維蘭德《金尼斯坦》第三冊，翻開的是〈露露，或魔笛〉</figcaption></figure>
+<blockquote class="verse"><p>我是世界的光。跟從我的，就不在黑暗裡走，必要得著生命的光。</p><cite>約翰福音 8:12（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>一本泛黃的童話書，最後變成全世界傳唱的歌劇。我們聊到，神也常常這樣使用平凡的東西，成就意想不到的美好。</p></aside>
+<h2 id="residence-s5">五、《魔笛》展間：羽毛與星空</h2>
+<p>順著童話書往裡走，就進到整間獻給《魔笛》的展廳。1791 年 9 月 30 日，《魔笛》在維也納郊區的維登劇院首演，莫札特親自指揮，寫劇本的席卡內德自己演捕鳥人帕帕基諾。兩個多月後，莫札特就過世了。</p>
+<p>莫札特和席卡內德的友誼其實就是在薩爾斯堡開始的：1780 年 9、10 月，席卡內德的劇團在薩爾斯堡演出，兩人一見如故。1789 年席卡內德接手維也納郊區的維登劇院，1791 年初邀莫札特合寫一部給一般市民看的歌唱劇——這就是《魔笛》。兩人都是共濟會成員，整部戲以共濟會的象徵寫成一則追尋智慧與光明的寓言。</p>
+<p>傳說首演前幾天，莫札特還有重要段落沒寫完，席卡內德乾脆把他「關」在劇院後面的一間小木屋裡趕稿。這間「魔笛小屋」後來被搬到薩爾斯堡，今天仍保存在薩爾斯堡莫札特基金會大樓旁的花園裡。首演由莫札特親自指揮，夜后由他的大姨子約瑟法・霍弗演唱，前一天他才剛完成單簧管協奏曲。《魔笛》立刻成為他最成功的歌劇——而他在兩個多月後的 12 月 5 日過世。</p>
+<p>牆上一排小小的版畫，畫的是早期演出裡各個角色的造型；下面的玻璃櫃裡，有一張大字寫著「Zauberflöte」的老海報，旁邊攤著各種早期劇本，其中一本封面印著義大利文「Il flauto magico」——這部用德語寫給維也納平民看的歌唱劇，很快就被翻譯、傳唱到整個歐洲。</p>
+<figure class="portrait"><img src="img/residence-06.jpg" width="1051" height="1400" loading="lazy" alt="太太在《魔笛》展間，身後是早期演出的角色版畫與老劇本"><figcaption>太太在《魔笛》展間，身後是早期演出的角色版畫與老劇本</figcaption></figure>
+<figure class="portrait"><img src="img/residence-07.jpg" width="1051" height="1400" loading="lazy" alt="早期《魔笛》角色版畫與海報、劇本"><figcaption>早期《魔笛》角色版畫與海報、劇本</figcaption></figure>
+<p>轉角的牆上則是一系列舞台設計稿，展題叫「羽毛與星空：帕帕基諾與夜后的百年變身」。說明牆提到，莫札特基金會從 19 世紀末開館以來，光是和《魔笛》有關的舞台與服裝設計就收藏了一千多件。一身羽毛的帕帕基諾和星空下的夜后，是整部戲最經典的兩個形象；夜后那首〈復仇的火焰在我心中燃燒〉唱到高音 F，是歌劇史上最高的音之一。</p>
+<figure class="landscape"><img src="img/residence-08.jpg" width="1400" height="1051" loading="lazy" alt="「羽毛與星空」展區：歷代《魔笛》舞台設計稿"><figcaption>「羽毛與星空」展區：歷代《魔笛》舞台設計稿</figcaption></figure>
+<p>《魔笛》裡有一首很溫柔的二重唱，是公主帕米娜和帕帕基諾一起唱的，歌頌夫妻之愛。歌詞的結尾說：丈夫與妻子、妻子與丈夫，一同靠近神聖（Mann und Weib, und Weib und Mann, reichen an die Gottheit an）。兩百多年前的這句歌詞，正好說出婚姻在信仰裡的樣子。</p>
+<blockquote class="verse"><p>有人攻勝孤身一人，若有二人便能抵擋他；三股合成的繩子不容易折斷。</p><cite>傳道書 4:12（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>在這間展廳，我幫太太拍了一張照片。她戴著紅色貝雷帽，站在兩百多年前的劇本旁邊笑著。《魔笛》講的是兩個人一起經過火和水的試煉，最後手牽手走進光裡。我們想，婚姻也是這樣：不是沒有試煉，而是有神在中間，兩個人一起走過去。</p></aside>
+<h2 id="residence-s6">六、莫札特的鋼琴、義大利之旅與少年的友誼</h2>
+<p>這間灑著自然光的房間擺著一架古鋼琴（fortepiano），琴架上還放著溫溼度計，看得出被小心保存。莫札特本人擁有的那架鋼琴出自維也納名匠安東・瓦爾特之手，約 1782 年製造，是他維也納時期作曲、演出的主力樂器，如今由莫札特基金會收藏在薩爾斯堡。牆上那幅紅衣少年在鍵盤前的肖像，是 1770 年莫札特 14 歲隨父親巡演義大利時，在維洛納畫下的。</p>
+<p>那幅維洛納肖像也有故事：1770 年 1 月，父子倆第一次義大利之旅經過維洛納，威尼斯共和國的財務總監皮耶特羅・盧吉亞蒂熱情接待，並請畫家在 1 月 6、7 日兩天為 13 歲的莫札特畫像。畫家究竟是維洛納名家奇尼亞羅利，還是他的外甥達拉・羅薩，至今仍有爭議。畫中琴架上的樂譜，是一首只靠這幅畫才流傳下來的〈維洛納快板〉。原作今為私人收藏，館內展出的應是複製品（請以展牌為準）。</p>
+<figure class="landscape"><img src="img/residence-09.jpg" width="1400" height="1051" loading="lazy" alt="古鋼琴與 14 歲莫札特的維洛納肖像"><figcaption>古鋼琴與 14 歲莫札特的維洛納肖像</figcaption></figure>
+<p>館內也掛著一幅手工上色的義大利古地圖，標題寫著「Statuum totius Italiae」（義大利全境諸國圖），出自紐倫堡的霍曼地圖社。那時的義大利還是一塊塊不同顏色的小國：薩伏依、威尼斯、教皇國、托斯卡尼、那不勒斯王國……莫札特父子在 1769 到 1773 年間三度南下，從維洛納、米蘭一路走到羅馬和那不勒斯。在羅馬，14 歲的莫札特聽了兩次西斯汀禮拜堂的《求主垂憐》（Miserere），回去就憑記憶把整首譜寫了下來。</p>
+<figure class="portrait"><img src="img/residence-10.jpg" width="1051" height="1400" loading="lazy" alt="霍曼地圖社的義大利全境圖"><figcaption>霍曼地圖社的義大利全境圖</figcaption></figure>
+<blockquote class="verse"><p>你們要用角聲讚美他，鼓瑟彈琴讚美他！</p><cite>詩篇 150:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>我們也是一路旅行到這裡的人。看著這張地圖，想到一個少年坐著馬車翻山越嶺，把在教堂裡聽到的聖樂帶回家——旅行真的會改變一個人，也正在改變我們。</p></aside>
+<h3>寫給好朋友的一封義大利文信（1770 年 9 月 10 日，波隆那）</h3>
+<p>就在這趟義大利之旅裡，14 歲的莫札特在佛羅倫斯遇見了同年出生的英國少年小提琴家湯瑪斯・林利（Thomas Linley Jr.）。兩個神童一見如故，幾天裡天天一起演奏，分別時還哭了。展櫃裡這封信，就是莫札特從波隆那用義大利文寫給林利的回信。</p>
+<p>信裡他說，很遺憾這次沒辦法再回佛羅倫斯，但會盡一切可能，好有「擁抱我親愛朋友」的喜樂；父親也很想再見到佛羅倫斯的朋友們。信末他署名「Amadeo Wolfgango Mozart」，自稱是林利「最忠實的僕人與最親愛的朋友」，請他永遠保守這份友誼。</p>
+<p>林利比莫札特只小四個月，12 歲就到佛羅倫斯跟名師納爾迪尼學琴。英國音樂史家伯尼 1770 年記錄說，「小托馬索」和「小莫札特」是全義大利都在談論、最有前途的兩位天才。兩人分別前一天，林利還送給莫札特一首由女詩人科莉拉寫的十四行詩——信裡問候的「科莉拉女士」就是她。據說莫札特後來說過：林利是真正的天才，要是活著，必定是音樂界最耀眼的人物之一。林利 1778 年 8 月 5 日在英國格林索普城堡的湖上划船時溺水。</p>
+<p>展牌最後一句讓人心酸：他們之後再也沒有見過面。1778 年，林利在一次划船意外中溺水過世，年僅 22 歲。</p>
+<figure class="landscape"><img src="img/residence-11.jpg" width="1400" height="1051" loading="lazy" alt="莫札特 1770 年從波隆那寫給林利的親筆信"><figcaption>莫札特 1770 年從波隆那寫給林利的親筆信</figcaption></figure>
+<blockquote class="verse"><p>約拿單的心與大衛的心相連；約拿單愛大衛，如同愛自己的性命。</p><cite>撒母耳記上 18:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>這封信的字跡好工整，看得出一個少年多珍惜這份友誼。我們想起那些在人生不同階段陪過我們、後來卻再也沒見到的朋友。也許該趁現在，寫封信或打通電話給他們，把想說的話說出來。</p></aside>
+<h2 id="residence-s7">七、維也納的十年（1781–1791）</h2>
+<p>前面幾個展間看的，多半是莫札特在薩爾斯堡的少年歲月。這一間往後，故事移到維也納——他生命裡最輝煌、也最辛苦的十年。</p>
+<h3>1781：離開薩爾斯堡，成為自由音樂人</h3>
+<p>1781 年 3 月，莫札特隨科洛雷多大主教到維也納。他在這裡的待遇像個僕人，與大主教的衝突愈演愈烈，終於在 6 月被解職。對當時的音樂家來說，離開宮廷等於放棄穩定的薪水，父親利奧波德極力反對；但莫札特選擇留下來，試著靠演奏、教學和作曲養活自己——這在 18 世紀是少見的冒險。</p>
+<p>他的收入主要來自三塊：演出自己的鋼琴協奏曲、訂閱音樂會和自己舉辦的「學院音樂會」（Akademie），再加上教貴族子弟彈琴與出版樂譜。維也納沙龍裡鋼琴是主角，他 25 歲以前寫了 10 首鋼琴協奏曲，維也納十年間又寫了 17 首。</p>
+<h3>1782：結婚</h3>
+<p>1782 年 8 月，他在聖斯德望主教座堂與康絲坦采・韋伯結婚，父親一直到最後都不太贊成。婚後兩人搬過許多次家，生了六個孩子，只有卡爾・托馬斯和弗朗茨・克薩韋爾兩個兒子長大成人。展櫃裡有一份手稿信，旁邊是一幅小肖像和聖斯德望主教座堂的版畫；說明牌我當時沒拍清楚，只能說這個組合讓人想到他們在這座教堂結婚的故事（請以展牌為準）。</p>
+<figure class="portrait"><img src="img/residence-12.jpg" width="975" height="1300" loading="lazy" alt="展櫃：手稿信、小肖像與聖斯德望主教座堂版畫（說明牌待確認）"><figcaption>展櫃：手稿信、小肖像與聖斯德望主教座堂版畫（說明牌待確認）</figcaption></figure>
+<h3>1786：《費加洛婚禮》與愛爾蘭朋友凱利</h3>
+<p>1786 年 5 月 1 日，《費加洛婚禮》在維也納宮廷劇院（Burgtheater）首演，劇本是達・蓬特根據博馬舍的革命喜劇改寫，政治諷刺被刻意淡化，但音樂仍清楚地描繪了貴族與僕人之間的階級張力。首演獲得熱烈迴響。</p>
+<p>展櫃裡那張戴著高領的男子版畫，是愛爾蘭男高音凱利（Michael Kelly, 1762–1826）。他 1783 年到維也納，在《費加洛婚禮》首演中同時演出音樂教師巴西利奧和公證人庫爾奇奧。他後來在 1826 年出版的回憶錄中，留下莫札特指揮排練的珍貴紀錄：莫札特是個非常瘦小、蒼白的人，滿頭金髮，而且很自豪；排練時他穿著深紅色大衣、戴著鑲金邊的帽子指揮。1787 年凱利離開維也納時，還去向「不朽的莫札特和他可愛的妻子與家人」告別。不過學者提醒，凱利回憶錄中有些說法不能全信，只能當作參考。</p>
+<figure class="landscape"><img src="img/residence-13.jpg" width="1300" height="975" loading="lazy" alt="凱利（Michael Kelly）版畫、莫札特 1789 年柏林王家劇院版畫與早期劇本"><figcaption>凱利（Michael Kelly）版畫、莫札特 1789 年柏林王家劇院版畫與早期劇本</figcaption></figure>
+<p>同一櫃的另一張版畫標示「莫札特在柏林王家劇院，1789 年」——那是他 1789 年春天的北德之行，離開維也納幾個星期去找新的機會。右邊翻開的小冊子畫著一對男女與野獸，我推測是與《魔笛》相關的早期版本，說明牌看不清，僅供參考。</p>
+<h3>維也納的劇院</h3>
+<p>旁邊牆上有兩張劇院圖：左邊是一幅大版畫，畫著擠滿觀眾的華麗大廳，舞台上有幾位穿紅袍的人物，頂上是畫著雲彩的穹頂；右邊是一幅劇院剖面圖，可以看到好幾層包廂、舞台下方的機關。法文標題寫著「Coupe et profil」，說明牌看不清楚，我無法確定是哪一座劇院，請你對照展牌。可以確定的是，18 世紀的歌劇是整個城市最重要的公共娛樂，莫札特的好幾部歌劇都是在這樣的環境裡誕生的。</p>
+<figure class="landscape"><img src="img/residence-14.jpg" width="1300" height="975" loading="lazy" alt="劇院內部版畫與剖面圖（劇院名稱待確認）"><figcaption>劇院內部版畫與剖面圖（劇院名稱待確認）</figcaption></figure>
+<p>再往裡走，紅色牆面上嵌著一幅幅舞台模型。我拍到的其中一幅有骷髏、方尖碑和墓園，與《唐喬凡尼》的墓地場景很相似，但我沒有看清楚說明牌，請以展牌為準。《唐喬凡尼》1787 年 10 月在布拉格首演大獲成功，1788 年再在維也納上演。</p>
+<figure class="landscape"><img src="img/residence-15.jpg" width="1300" height="975" loading="lazy" alt="紅牆上的舞台模型與設計稿（疑為墓園場景，請以展牌為準）"><figcaption>紅牆上的舞台模型與設計稿（疑為墓園場景，請以展牌為準）</figcaption></figure>
+<h3>1787 年以後：盛名與開銷</h3>
+<p>1787 年 5 月，父親利奧波德去世。從這一年開始，莫札特的處境有些微妙：他的收入遠高於一般音樂家，卻比不上他想進入的貴族圈；他和妻子養成了與身分不符的奢侈品味。1788 年爆發土耳其戰爭，壓縮了維也納的社交生活，加上康絲坦采生病，家裡出現資金缺口。他寫信向朋友借錢，也有人說他死時負債三萬弗洛林——這數字是死後流傳的謠言，學者至今仍在爭論。</p>
+<p>不過他並不是窮到沒飯吃。學者研究發現，他的年收入大致相當於商人或高階官員，真正的問題是病痛減少了他能教學、演出、作曲的收入，加上花費也大：他們住在維也納較高級的公寓，請僕人，送兒子卡爾進昂貴的寄宿學校，社交頻繁。最後一年（1791）反而是他最多產、收入也很可觀的一年：寫了《魔笛》、《提圖斯的仁慈》、單簧管協奏曲、《Ave verum corpus》，並開始《安魂曲》。</p>
+<p>維也納十年的另一件事是他的朋友圈：海頓是他最敬重的前輩，兩人互相致敬；斯維滕男爵帶他認識巴赫與韓德爾；達・蓬特給了他三部經典歌劇的劇本。這些友誼和他的音樂一樣，都是他在維也納留下的資產。</p>
+<blockquote class="verse"><p>我知道怎樣處卑賤，也知道怎樣處豐富；或飽足或飢餓，或有餘或缺乏，隨事隨在，我都得了秘訣。</p><cite>腓立比書 4:12（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>原來莫札特也有帳單、有借錢、有被生活壓得喘不過氣的日子。可是他的音樂裡沒有一絲怨氣。我們想起自己人生中起伏的階段，也提醒自己：無論豐足或缺乏，都要學習知足、感恩。</p></aside>
+<h2 id="residence-s8">八、病中的莫札特</h2>
+<p>另一幅油畫畫的是晚年的莫札特：他靠著大枕頭、腿上蓋著毯子，伸手指向一旁的琴或樂譜。這類畫是 19 世紀以後人們想像莫札特最後時光的作品，帶著濃濃的浪漫色彩。1791 年 12 月，他在維也納過世，年僅 35 歲；臨終前仍在寫的是《安魂曲》，沒能完成。同一年，他還寫下了短短的聖體經文歌《Ave verum corpus》（K. 618），至今仍是教會最常唱的聖樂之一。</p>
+<p>早在 1787 年父親病重時，莫札特就寫信說，他已經學會把死亡看作「人真正的好朋友」，每晚睡前都想到自己也許明天就不在了，卻因此更感恩。</p>
+<figure class="portrait"><img src="img/residence-16.jpg" width="1051" height="1400" loading="lazy" alt="描繪病中莫札特的油畫"><figcaption>描繪病中莫札特的油畫</figcaption></figure>
+<blockquote class="verse"><p>我們活著是為主而活，死了是為主而死。所以，我們或活或死總是主的人。</p><cite>羅馬書 14:8（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>看完這幅畫，我們在房間裡站了很久。35 歲，留下六百多首作品。我們彼此說：日子不在長短，在於是不是用來讚美、用來愛人。走出故居，聖三一教堂的鐘聲正好響起。</p></aside>
+<h2 id="residence-s9">九、身後的莫札特：誰在說他的故事？</h2>
+<p>1791 年 12 月 5 日，莫札特過世。他的名聲在死後才真正擴大，而這背後有一位關鍵人物：遺孀康絲坦采。她安排《安魂曲》由弟子絮斯邁爾完成，賣掉手稿，舉辦紀念音樂會，最後成功地讓自己和孩子擺脫貧困。她後來改嫁丹麥外交官尼森（Georg Nikolaus von Nissen），兩人一起整理莫札特的文獻。</p>
+<p>這個展櫃正是談這一段歷史。左邊那本舊書是尼森的《莫札特傳》（Biographie W. A. Mozart&#x27;s）。尼森 1826 年過世時只寫了一小部分，書由別人依據他的筆記完成，1828 年（實際出版在 1829 年）由萊比錫的布萊特科普夫出版社出版。他拿到南妮爾提供的約 400 封莫札特家書，是後世研究的重要來源；但他從沒見過莫札特，主要依賴康絲坦采的回憶，因此書中對莫札特和妻子的描寫偏向美化，學者讀的時候都要小心。</p>
+<figure class="portrait"><img src="img/residence-17.jpg" width="975" height="1300" loading="lazy" alt="展櫃：尼森《莫札特傳》、「莫札特之耳」水彩、手稿與莫札特側面像；上方為紅衣軍裝肖像（身分待確認）"><figcaption>展櫃：尼森《莫札特傳》、「莫札特之耳」水彩、手稿與莫札特側面像；上方為紅衣軍裝肖像（身分待確認）</figcaption></figure>
+<p>書旁邊的那幅畫框，是兩隻耳朵的水彩，也就是醫學上有名的「莫札特耳」。莫札特的左耳缺少一般耳廓內的耳甲凹，這種罕見的先天畸形後來被叫作「莫札特耳」。圖上的「我的耳朵」和「一般的耳朵」是他的小兒子弗朗茨・克薩韋爾寫的，後來尼森把「我的」劃掉改成「莫札特的」。也有學者認為，這其實是他兒子的耳朵。後世曾有人從這個特徵推測他的健康問題，但這些推論始終只是推測。</p>
+<p>左下角的手稿像是家人的回憶紀錄，右下是版畫側面像；最上方是一幅穿紅色軍裝的肖像，反光太強，我認不出是誰。這些說明牌我都沒拍到清楚，請你日後補照或對照後告訴我，我再修正。</p>
+<p>展廳裡還有另一面牆，在古鋼琴上方掛了三幅肖像：左邊是兩個依偎的孩子，中間是一位穿白色薄紗、手拿書本的女士，右邊是穿深色大衣的男士。我不確定他們是誰，可能與莫札特家族或其後人有關，請以說明牌為準。</p>
+<figure class="portrait"><img src="img/residence-18.jpg" width="975" height="1300" loading="lazy" alt="古鋼琴上方的三幅肖像（人物身分待確認）"><figcaption>古鋼琴上方的三幅肖像（人物身分待確認）</figcaption></figure>
+<blockquote class="verse"><p>義人的記念，必被稱頌。</p><cite>箴言 10:7（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>我們一路讀著這些書、信與畫，才發現「記得一個人」本身就是一件需要用心的事：誰在記、怎麼記、記得是否真實。我們也想成為這樣的人——不只活出自己的故事，也真誠地記住別人的故事。</p></aside>
+<h2 id="residence-s10">旅人小記</h2>
+<ul><li>莫札特故居與出生地都由莫札特基金會（Mozarteum）經營，持薩爾斯堡卡可以兩館都參觀；故居通常人比較少，建議預留約 1.5 小時。</li><li>一樓的「舞蹈教師大廳」（Tanzmeistersaal）是一家人辦家庭音樂會的地方。</li><li>參觀完可以走到對面的聖三一教堂，或去薩爾斯堡主座教堂看莫札特受洗的洗禮盆。</li><li>看展前先聽一段《伊多梅紐斯》、《魔笛》和《Ave verum corpus》，看到手稿時會更有感覺。</li></ul>
+<p class="refs">參考資料：Britannica〈Mozart: Vienna〉、Mediathek.at〈Wiener Jahre 1781–1791〉、Wikipedia〈Michael Kelly (tenor)〉〈Georg Nikolaus von Nissen〉〈Appearance and character of Wolfgang Amadeus Mozart〉、Yale 音樂圖書館〈Nissen Biographie〉、Braunbehrens《Mozart in Vienna 1781–1791》、莫札特基金會官網、Wikipedia〈Portrait of the Mozart Family〉〈Tanzmeisterhaus Salzburg〉〈Libretto of The Magic Flute〉、Projekt Gutenberg《莫札特書信集》、薩爾斯堡旅遊局、大都會歌劇院《伊多梅紐斯》介紹。經文引自中文和合本。</p>
+<nav class="pn"><a href="#ramsau" data-go="ramsau"><small>上一篇</small>拉姆紹教堂：霧裡的洋蔥頂</a><a class="r" href="#birthplace" data-go="birthplace"><small>下一篇</small>糧食胡同 9 號：莫札特出生的地方</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-birthplace" hidden>
+  <header class="posthead"><span class="place">莫札特出生地 Mozarts Geburtshaus</span><h1>糧食胡同 9 號：莫札特出生的地方</h1><p class="meta">2026 年 11 月 21 日 · 薩爾斯堡 · 約 12 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="birthplace-s1">一、哈格瑙爾之家：一個家庭的 26 年</button></li><li><button type="button" data-scroll="birthplace-s2">二、父親利奧波德與《小提琴演奏法》</button></li><li><button type="button" data-scroll="birthplace-s3">三、1762 年的維也納：女皇送的禮服</button></li><li><button type="button" data-scroll="birthplace-s4">四、三年半的歐洲大巡演與巴黎的下午茶</button></li><li><button type="button" data-scroll="birthplace-s5">五、莫札特的小提琴們</button></li><li><button type="button" data-scroll="birthplace-s6">六、黑絨枕上的私人小物</button></li><li><button type="button" data-scroll="birthplace-s7">七、莫札特是個怎樣的人？</button></li><li><button type="button" data-scroll="birthplace-s8">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>從故居出來，我和太太過了河，走進老城最熱鬧的糧食胡同（Getreidegasse）。在一排掛著鐵藝招牌的老房子中間，鵝黃色的 9 號特別顯眼——莫札特就在這裡出生、長大，直到 17 歲全家搬過河去。這一篇不只記錄我們看到的展品，也把背後的歷史脈絡整理下來。</p>
+<h2 id="birthplace-s1">一、哈格瑙爾之家：一個家庭的 26 年</h2>
+<p>這棟房子正式的名字是「哈格瑙爾之家」（Hagenauerhaus）。1703 年起，它屬於從外地遷來的哈格瑙爾家族；莫札特一家的房東，是做雜貨與香料生意的商人約翰・洛倫茲・哈格瑙爾（1712–1792）。</p>
+<p>1747 年 11 月 21 日，28 歲的宮廷樂師利奧波德・莫札特和安娜・瑪麗亞・佩爾特結婚，隨即租下這棟樓的四樓（當地稱三樓）：一間廚房、一個小房間、客廳、臥室和一間書房。全家在這裡住了整整 26 年，1773 年才搬到對岸的「舞蹈教師之家」，也就是我們早上去的故居。</p>
+<p>哈格瑙爾不只是房東，更是全家最信任的朋友和「金主」。莫札特一家出外巡演的那些年，利奧波德寫了大量長信給他，報告每一場演出、每一筆開銷、孩子的健康，甚至請他在薩爾斯堡的教堂為全家代禱、安排彌撒。今天我們對莫札特童年巡演的了解，很大一部分就來自這批寫給哈格瑙爾的信。</p>
+<p>1856 年莫札特百歲冥誕時，這裡辦過一場大型紀念展；1880 年，莫札特基金會正式在這間舊公寓設立博物館，至今仍是奧地利參觀人數最多的博物館之一。門邊那塊「Notenflug」小牌子，是藝術家費爾丁格在立面上做的裝置〈Flying Notes. K.265〉——K. 265 正是《小星星變奏曲》。</p>
+<figure class="portrait"><img src="img/birthplace-01.jpg" width="1050" height="1400" loading="lazy" alt="糧食胡同 9 號的黃色立面與大門"><figcaption>糧食胡同 9 號的黃色立面與大門</figcaption></figure>
+<blockquote class="verse"><p>你們看，兒女是耶和華所賜的產業；所懷的胎是他所給的賞賜。</p><cite>詩篇 127:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>利奧波德和安娜・瑪麗亞一共生了七個孩子，只有第四個南妮爾和最小的沃夫岡活下來。站在這扇門前，想到這對夫妻在同一間屋子裡一次次迎接、又一次次送走孩子，我們心裡很有感觸。偉大的音樂家，是從一個平凡家庭的盼望與眼淚中誕生的。</p></aside>
+<h2 id="birthplace-s2">二、父親利奧波德與《小提琴演奏法》</h2>
+<p>利奧波德 1719 年生於德國奧格斯堡，是一位受人敬重的裝訂匠的長子。1737 年他到薩爾斯堡的本篤會大學讀哲學，後來轉向音樂，1743 年進入大主教的宮廷樂團當第四小提琴手，到 1763 年已升為副樂長。展牌形容他自律、有學問、品味不凡，他對詩、哲學和科學都有濃厚興趣。</p>
+<p>1756 年——正好是莫札特出生那年——他在奧格斯堡出版了《小提琴演奏法》（Versuch einer gründlichen Violinschule），獻給當時的薩爾斯堡大主教。這本書和 C. P. E. 巴赫的鍵盤教本（1753）、匡茲的長笛教本（1752）並列為 18 世紀三大演奏教本，今天的古樂演奏家仍然靠它理解當時的音樂風格。它在德國再版了兩次（1769、1787），還被譯成荷蘭文（1766）和法文（1770）。櫃子裡那本翻開的書頁，是初版卷首的利奧波德持琴版畫像。</p>
+<p>利奧波德的薪水不高，靠教小提琴補貼家用。兩個孩子沒有上學，全由他在家教讀寫、繪畫、算術，還有一些歷史和地理。後人常批評他控制慾強、把孩子當搖錢樹，但從他的信裡也看得出，他真心相信這個孩子的天賦是神所賜的「奇蹟」，自己有責任讓世界看見。</p>
+<figure class="portrait"><img src="img/birthplace-02.jpg" width="1050" height="1400" loading="lazy" alt="利奧波德・莫札特，約 1765 年，可能出自羅倫佐尼（語音導覽 02）"><figcaption>利奧波德・莫札特，約 1765 年，可能出自羅倫佐尼（語音導覽 02）</figcaption></figure>
+<figure class="portrait"><img src="img/birthplace-03.jpg" width="1050" height="1400" loading="lazy" alt="少年莫札特肖像與下方展出的《小提琴演奏法》"><figcaption>少年莫札特肖像與下方展出的《小提琴演奏法》</figcaption></figure>
+<blockquote class="verse"><p>教養孩童，使他走當行的道，就是到老他也不偏離。</p><cite>箴言 22:6（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>父親寫了一本教全歐洲人拉琴的書，而他最好的學生，就是自己的兒子。嚴格的背後，是想把孩子的恩賜好好守住——這份心情，天下父母都懂。</p></aside>
+<h2 id="birthplace-s3">三、1762 年的維也納：女皇送的禮服</h2>
+<p>1762 年，六歲的沃夫岡和十一歲的南妮爾第一次出遠門。一家人沿著多瑙河坐船東行，在林茲辦了第一場公開音樂會；消息傳到維也納，皇太子約瑟夫告訴了母親瑪麗亞・特蕾莎女皇，孩子們很快就被召進美泉宮演奏。利奧波德寫信給哈格瑙爾說，小沃夫岡演奏完後跳到女皇膝上，摟著她的脖子親了她。</p>
+<p>幾天後，宮廷派人送來兩件禮物：給沃夫岡的是一套淡紫色波紋絲綢、鑲金邊的禮服，原本屬於和他同年的大公馬克西米利安・法蘭茲；給南妮爾的則是一件公主的禮服。當時宮廷習慣把皇室孩子穿過的衣服賞給下屬，但對一個薩爾斯堡樂師家庭來說，這是天大的榮耀。</p>
+<p>回到薩爾斯堡後，利奧波德請畫家羅倫佐尼為姊弟畫了這兩幅穿禮服的肖像（約 1763 年），這是公認最早、最可信的莫札特畫像。此後這兩套禮服就成了孩子們巡演時的「演出服」。牆最左邊是母親安娜・瑪麗亞的肖像。</p>
+<figure class="landscape"><img src="img/birthplace-04.jpg" width="1400" height="1050" loading="lazy" alt="母親、南妮爾與穿著女皇禮服的小莫札特"><figcaption>母親、南妮爾與穿著女皇禮服的小莫札特</figcaption></figure>
+<blockquote class="verse"><p>你們若不回轉，變成小孩子的樣式，斷不得進天國。</p><cite>馬太福音 18:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>畫裡的小莫札特一手插腰、有點神氣，又帶著孩子的稚氣。最偉大的音樂家，也曾是一個會撲進大人懷裡的小男孩。</p></aside>
+<h2 id="birthplace-s4">四、三年半的歐洲大巡演與巴黎的下午茶</h2>
+<p>維也納之行後不到半年，1763 年 6 月 9 日，全家四口又出發了，這一趟直到 1766 年 11 月 30 日才回家，前後三年半，史稱莫札特家族的「大巡演」。路線是：慕尼黑、法蘭克福、布魯塞爾，同年 11 月 18 日抵達巴黎，在凡爾賽宮過聖誕；1764 年 4 月 23 日到倫敦，一住就是 15 個月；接著意外地繞道荷蘭，再經巴黎、瑞士回到薩爾斯堡。這趟旅程被認為是現代「巡迴演出」的始祖，也讓莫札特成為後世衡量所有神童的標準。</p>
+<p>旅程並不浪漫。出發才一個多月，利奧波德就寫信告訴哈格瑙爾，七歲的兒子半夜好幾次哭醒，想家。途中孩子們也接連生過重病。</p>
+<p>窗邊那幅畫，記錄的是 1766 年回程經過巴黎的一幕。原作是法國畫家奧利維耶的〈四面鏡沙龍的英式下午茶〉，今天收藏在凡爾賽宮；館內這幅是 19 世紀上半葉的油畫摹本。地點是孔蒂親王在巴黎的府邸「聖殿宮」（已拆除），親王和他的情人布夫萊伯爵夫人辦的下午茶在當時遠近馳名。畫面左邊，小莫札特坐在鍵盤前，旁邊抱著吉他自彈自唱的，是巴黎歌劇院的名男高音熱利約特（1713–1797）。</p>
+<figure class="landscape"><img src="img/birthplace-05.jpg" width="1400" height="1050" loading="lazy" alt="〈孔蒂親王府的下午茶〉，摹自奧利維耶 1766 年原作"><figcaption>〈孔蒂親王府的下午茶〉，摹自奧利維耶 1766 年原作</figcaption></figure>
+<blockquote class="verse"><p>好，你這又良善又忠心的僕人；你在不多的事上有忠心，我要把許多事派你管理。</p><cite>馬太福音 25:21（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>滿屋子的貴族在喝茶聊天，角落裡一個十歲的孩子安靜地彈琴。我們在畫前找了好一會兒才找到他。在熱鬧的場合裡默默把自己的事做好，好像也是信仰生活的樣子。</p></aside>
+<h2 id="birthplace-s5">五、莫札特的小提琴們</h2>
+<p>莫札特基金會擁有世界上最多的莫札特樂器：三把小提琴、一把中提琴和兩件鍵盤樂器。</p>
+<p>他的第一把小提琴，是父親在他六、七歲時給的，出自薩爾斯堡宮廷製琴師安德烈亞斯・費迪南・邁爾（1693–1764）之手——邁爾也是利奧波德在宮廷樂團的同事，名字還寫在琴身內的標籤上。這把琴不到標準尺寸的一半，是典型的兒童琴，大約做於 1746 年前後。利奧波德在《小提琴演奏法》裡，也特別寫到小尺寸的琴該怎麼用。</p>
+<p>另一把是他的音樂會小提琴，出自 18 世紀初德國米滕瓦爾德的克洛茲家族工坊。1781 年莫札特搬去維也納時沒有帶走它，而是留給了姊姊；南妮爾晚年在 1820 年把這把琴和他的兒童小提琴一起賣掉，經過輾轉，最後才回到這棟房子。照片裡懸在窗前的這把是全尺寸的琴，看起來應該是這把音樂會小提琴（請以現場展牌為準）。琴下方刻著三個德文字：LICHT、LIEBE、LEBEN——光、愛、生命。</p>
+<figure class="portrait"><img src="img/birthplace-06.jpg" width="1050" height="1400" loading="lazy" alt="懸在窗前的小提琴，底座刻著 LICHT LIEBE LEBEN"><figcaption>懸在窗前的小提琴，底座刻著 LICHT LIEBE LEBEN</figcaption></figure>
+<blockquote class="verse"><p>神就是光，在他毫無黑暗……神就是愛。</p><cite>約翰一書 1:5；4:8（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>光、愛、生命，這三個字讓我們在琴前停了很久。耶穌說「我就是道路、真理、生命」——一把琴、三個字，好像把莫札特的音樂和我們的信仰連在一起了。</p></aside>
+<h2 id="birthplace-s6">六、黑絨枕上的私人小物</h2>
+<p>另一個玻璃櫃裡，黑色絨布枕頭上放著幾件很小的東西：繪有圖畫的圓形小盒、鑲貝殼的小盒子、一枚紅色寶石的小印章，還有一個折起來的小紙包。館方網站提到，館內也收藏了一撮莫札特的頭髮。比起名畫和手稿，這些隨身小物更讓人感覺到，這是一家真實生活過的人。</p>
+<figure class="portrait"><img src="img/birthplace-07.jpg" width="1050" height="1400" loading="lazy" alt="黑絨枕上的私人小物"><figcaption>黑絨枕上的私人小物</figcaption></figure>
+<blockquote class="verse"><p>就是你們的頭髮也都被數過了。</p><cite>馬太福音 10:30（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>神連我們的頭髮都數過。兩百多年前的一個小紙包被這樣小心收藏，每個人的生命，也都被祂記得。</p></aside>
+<h2 id="birthplace-s7">七、莫札特是個怎樣的人？</h2>
+<h3>童年：愛哭、愛撒嬌、愛音樂</h3>
+<p>莫札特過世後，姊姊南妮爾為第一本莫札特傳記蒐集資料，請全家的老朋友、宮廷小號手沙赫特納（1731–1795）寫下回憶。這封 1792 年的信，是我們認識童年莫札特最生動的第一手資料：</p>
+<ul><li>他非常黏人，一天會問沙赫特納十次「你愛不愛我？」，對方開玩笑說不愛，他就眼眶含淚。</li><li>他六歲收到一把小提琴，有一次大人們練三重奏，他吵著要拉第二小提琴，父親不准，他就哭著抱琴走開；後來被允許「小聲地」跟著拉，結果越拉越好，把沙赫特納的部分整個接了過去。</li><li>他怕小號怕得要命。父親想治他這個毛病，叫沙赫特納對著他吹，結果他臉色發白、差點昏倒。</li></ul>
+<p>南妮爾也回憶，旅行坐馬車時，弟弟會幻想出一個自己當國王的「後面王國」，讓僕人幫他畫地圖、記下城鎮名字；他對父母，尤其對父親，有一份非常溫柔的愛。</p>
+<h3>倫敦的測驗：天才，也是個孩子</h3>
+<p>1764–65 年在倫敦，很多人懷疑利奧波德謊報兒子年齡。皇家學會會員、律師兼博物學家巴靈頓親自上門「科學測試」八歲的莫札特：給他從沒看過的樂譜當場視唱視奏、要他即興表現不同情緒、甚至用手帕蓋住琴鍵讓他彈。孩子全都過關，還會糾正父親的錯音。可是測到一半，家裡的貓走進來，他立刻丟下大鍵琴去追貓，好一陣子都叫不回來；之後又騎著一根棍子在房間裡當馬跑。巴靈頓說，這反而讓他確信這真的是個小孩。</p>
+<h3>長大後：幽默、愛玩、重感情</h3>
+<p>莫札特一生留下大量書信，讀起來就像本人在說話：坦率、敏銳、充滿生命力。他愛玩文字遊戲、把句子顛倒來寫逗姊姊；寫給表妹的「Bäsle 信」裡滿是低俗的廁所笑話——學者估計他約有 39 封信帶這類幽默，多半寫給家人，在當時南德的家庭裡並不罕見。</p>
+<p>他愛打撞球（在維也納家裡有自己的撞球台），愛跳舞，1783 年維也納嘉年華還扮成丑角跳了一整夜；養過金絲雀、狗、一匹馬，還有一隻會唱他鋼琴協奏曲 K. 453 旋律的椋鳥，鳥死時他還為牠辦了「葬禮」。一位朋友回憶，他心地善良，總想讓別人高興。也有人指出他花錢不知節制、常向朋友借錢，但寫信時仍以真誠和感恩相待。</p>
+<p>他在 1791 年 10 月寫給妻子康斯坦采的信裡，還輕鬆地說自己打了兩局撞球、喝了黑咖啡、抽了一斗菸——兩個月後他就過世了，完全不知道那是自己生命的最後時光。</p>
+<h3>牆上的幾張臉</h3>
+<p>館內這幾件作品，也正好說明「莫札特長什麼樣子」其實是一個謎：</p>
+<ul><li>〈未完成的肖像〉：他的姊夫、演員兼畫家約瑟夫・朗格所畫。妻子康斯坦采晚年說，這是「目前為止最像他的一張」。過去一直以為是畫家沒畫完，近年研究發現，它其實是把一張小型頭像放大、加畫身體時中途停下的作品。</li><li>波施的側面浮雕（1788–89）：雕刻家波施做的一系列側面像，被認為是莫札特晚年可信的樣貌；館內這件是鑄鐵勳章。</li><li>〈手捧鳥巢的男孩〉：1924 年基金會花大錢從英國畫商買下，書上寫著「W. A. Mozart 1764」，九十年來都被當作八歲莫札特的畫像。後來研究證實，名字和畫家簽名都是前任畫主為了賣畫而加上去的——畫中人根本不是莫札特。</li><li>羅馬科 1877 年的〈坐在擊弦古鋼琴前的莫札特〉：莫札特基金會委託奧地利名畫家羅馬科所繪，畫中有繆思和天使圍繞，是 19 世紀浪漫主義眼中的「天才莫札特」，當年展示在「魔笛小屋」裡。</li></ul>
+<figure class="portrait"><img src="img/birthplace-08.jpg" width="900" height="1200" loading="lazy" alt="朗格所繪〈未完成的肖像〉，康斯坦采認為最像他"><figcaption>朗格所繪〈未完成的肖像〉，康斯坦采認為最像他</figcaption></figure>
+<figure class="landscape"><img src="img/birthplace-09.jpg" width="1200" height="900" loading="lazy" alt="波施的莫札特側面勳章與浮雕照片"><figcaption>波施的莫札特側面勳章與浮雕照片</figcaption></figure>
+<figure class="portrait"><img src="img/birthplace-10.jpg" width="900" height="1200" loading="lazy" alt="〈手捧鳥巢的男孩〉——曾被當作莫札特九十年"><figcaption>〈手捧鳥巢的男孩〉——曾被當作莫札特九十年</figcaption></figure>
+<figure class="portrait"><img src="img/birthplace-11.jpg" width="900" height="1200" loading="lazy" alt="羅馬科 1877 年所繪的莫札特與繆思"><figcaption>羅馬科 1877 年所繪的莫札特與繆思</figcaption></figure>
+<blockquote class="verse"><p>喜樂的心乃是良藥。</p><cite>箴言 17:22（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>原來那個寫出《安魂曲》的人，小時候會一天問十次「你愛不愛我」，會丟下大鍵琴去追貓，長大後愛開玩笑、愛打撞球。我們很喜歡這樣的莫札特：天才不是不食人間煙火，而是把喜樂和真誠都放進了音樂裡。</p></aside>
+<h2 id="birthplace-s8">旅人小記</h2>
+<ul><li>參觀約一小時；館內沒有無障礙設施，樓梯較窄。持薩爾斯堡卡免費，和故居的聯票 48 小時內有效。</li><li>11 月 21 日當天提早到下午 4 點關門，平常是 9:00–17:30。</li><li>出門後步行幾分鐘就是薩爾斯堡主座教堂，莫札特出生隔天在那裡受洗。</li></ul>
+<p class="refs">參考資料：莫札特基金會官網（出生地、樂器收藏）、Wikipedia〈Mozart&#x27;s birthplace〉〈Mozart family grand tour〉〈Leopold Mozart〉〈Versuch einer gründlichen Violinschule〉、紐約摩根圖書館莫札特展、Google Arts &amp; Culture 莫札特博物館館藏、Getty 出版品、habsburger.net、薩爾斯堡旅遊局。經文引自中文和合本。</p>
+<nav class="pn"><a href="#residence" data-go="residence"><small>上一篇</small>走進莫札特的家</a><a class="r" href="#fortress" data-go="fortress"><small>下一篇</small>霍亨薩爾斯堡要塞與「白色黃金」</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-fortress" hidden>
+  <header class="posthead"><span class="place">霍亨薩爾斯堡要塞 Festung Hohensalzburg</span><h1>霍亨薩爾斯堡要塞與「白色黃金」</h1><p class="meta">2026 年 11 月 21 日 · 薩爾斯堡 · 約 17 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="fortress-s1">一、一座蓋了九百多年的「教會要塞」</button></li><li><button type="button" data-scroll="fortress-s2">二、站在高處看薩爾斯堡</button></li><li><button type="button" data-scroll="fortress-s3">三、這座城為什麼這麼富有？答案是鹽</button></li><li><button type="button" data-scroll="fortress-s4">四、要塞的另一面：牢房與囚禁</button></li><li><button type="button" data-scroll="fortress-s5">五、要塞也是兵營：薩爾斯堡的「自家軍團」</button></li><li><button type="button" data-scroll="fortress-s6">六、牆上的主教們：哈拉赫與菲爾米安</button></li><li><button type="button" data-scroll="fortress-s7">七、最頂樓：雷克塔的 360 度全景</button></li><li><button type="button" data-scroll="fortress-s8">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>這天我們從舊城往上走，來到薩爾斯堡最醒目的地標——霍亨薩爾斯堡要塞（Festung Hohensalzburg）。它蓋在海拔約五百公尺的要塞山上，從舊城的任何一條街抬頭，都看得見那一圈白色的城牆。</p>
+<h2 id="fortress-s1">一、一座蓋了九百多年的「教會要塞」</h2>
+<p>要塞的起點在 1077 年。當時的薩爾斯堡大主教格布哈德（Gebhard von Helfenstein）正處於「敘任權之爭」的風暴中：他站在教宗一邊，與神聖羅馬帝國皇帝亨利四世對抗，於是下令在城市上方築一座防禦的城堡。最早只是一座木造的圍牆與塔樓；格布哈德 1085 年被迫流亡，後繼的大主教們才陸續把它改建成石造，並完成基本的規模。</p>
+<p>今天看到的樣貌，主要來自 1495 至 1519 年在位的大主教萊昂哈德・馮・克楚赫（Leonhard von Keutschach）。他把要塞擴建成後期哥德式的諸侯居所：華麗的「君主廳」、1501–1502 年的聖喬治教堂，還有 1502 年裝設的機械管風琴「薩爾斯堡公牛」，以及 1504 年用來往山上運送物資的纜索軌道 Reisszug，被認為是歐洲最早的纜車之一。整座要塞長約 250 公尺、寬約 150 公尺，是中歐保存最完整的中世紀城堡之一。</p>
+<p>這座要塞從來沒有被外敵攻下，唯一一次被圍困是 1525 年的農民戰爭：礦工、農民與市民起義，從 6 月到 8 月圍困要塞，大主教馬圖斯・朗（Matthäus Lang）和隨從被困在山上，但要塞沒有失守。平常大主教們大部分時間並不住在山上，而是住在山下舊城中心的主教宮（Residenz）。換句話說，它更像是權力的宣示：向城裡的市民、向外面的諸侯說，這片土地由教會的君王統治。</p>
+<figure class="portrait"><img src="img/fortress-01.jpg" width="1049" height="1400" loading="lazy" alt="從要塞的菱格窗往下看：舊城的教堂塔樓與屋頂（右上為方濟會教堂方向，請以實景為準）"><figcaption>從要塞的菱格窗往下看：舊城的教堂塔樓與屋頂（右上為方濟會教堂方向，請以實景為準）</figcaption></figure>
+<blockquote class="verse"><p>萬軍之耶和華與我們同在；雅各的神是我們的避難所。</p><cite>詩篇 46:7（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>隔著鐵窗看出去，整座城像被框在一幅畫裡。我們想，要塞的牆是人蓋的避難所，但真正讓人安心的，是不論在山上或山下，神都與我們同在。</p></aside>
+<h2 id="fortress-s2">二、站在高處看薩爾斯堡</h2>
+<p>登上城牆平台，視野一下子打開：薩爾察赫河（Salzach）從遠處彎進舊城，河的一側是舊城（莫札特出生地所在），另一側是新城（莫札特故居所在）。照片右側最大的青綠色圓頂，是薩爾斯堡主座教堂；它前方的卡匹特廣場（Kapitelplatz）上，那顆金色的球體是現代雕塑，常被當作舊城裡的小地標（說明請以現場為準）。</p>
+<p>那天是陰雨的 11 月，山頭的樹葉有橘、有黃，屋頂被雨淋成深灰色。比起夏天明亮的景色，這種安靜的色調，反而更像兩百多年前莫札特看到的薩爾斯堡。</p>
+<figure class="landscape"><img src="img/fortress-02.jpg" width="1400" height="1050" loading="lazy" alt="我和太太在要塞城牆上的合照，背景是薩爾斯堡舊城與主座教堂"><figcaption>我和太太在要塞城牆上的合照，背景是薩爾斯堡舊城與主座教堂</figcaption></figure>
+<figure class="landscape"><img src="img/fortress-03.jpg" width="1400" height="592" loading="lazy" alt="要塞上的全景：左邊是山林與小屋，右邊是舊城與薩爾察赫河"><figcaption>要塞上的全景：左邊是山林與小屋，右邊是舊城與薩爾察赫河</figcaption></figure>
+<aside class="heart"><span>我們的感動</span><p>和太太站在這裡，雨滴還掛在外套上，兩個人笑得很開心。我們想起，今天早上從莫札特的故居出來，現在又站在他每天看見的山上俯瞰這座城，感覺好像在這個城市裡，被歷史輕輕擁抱。</p></aside>
+<h2 id="fortress-s3">三、這座城為什麼這麼富有？答案是鹽</h2>
+<p>「薩爾斯堡」的名字，字面意思就是「鹽之堡」（Salz＝鹽，Burg＝城堡）。這不是巧合：整座城能蓋出主教座堂、宮殿和要塞，靠的是被稱為「白色黃金」的鹽。</p>
+<ul><li>鹽的產地在附近的哈萊因（Hallein）與杜恩貝格（Dürrnberg）山區。早在鐵器時代，凱爾特人就已在這裡開採。12 世紀前後，薩爾斯堡的大主教們重新重視這個礦，哈萊因採鹽最早出現在 1198 年的文件中。</li><li>為了搶鹽的利益，爭奪非常激烈：1196 年，薩爾斯堡大主教阿達爾貝特曾經把巴伐利亞的萊興哈爾城連同鹽場一把火燒掉。</li><li>鹽被壓成圓錐形的木桶，裝上船，順著薩爾察赫河運到下游，沿河的城鎮因此繁榮。這筆穩定的收入，成了大主教們「富甲一方」的基礎，也讓他們得以把舊城建成今天的巴洛克樣貌。</li></ul>
+<p>走進要塞內的展廳，木樑天花板下是一座用白色（鹽色）材質做成的薩爾斯堡立體模型：山丘上的要塞、舊城的教堂圓頂與屋頂、河邊成排的建築，一覽無遺。牆上的標語寫著：「Der Mensch kann ohne Gold leben, aber nicht ohne Salz」，英文是「Humankind can live without gold yet not without salt」——人沒有黃金還能活，沒有鹽卻不行。另一句標語說的是這裡是「水、鹽與阿爾卑斯山交會」的地方（Wo sich Wasser, Salz und die Alpen kreuzen）。</p>
+<figure class="portrait"><img src="img/fortress-04.jpg" width="1049" height="1400" loading="lazy" alt="要塞展廳裡的薩爾斯堡城市模型，牆上寫著「人沒有黃金還能活，沒有鹽卻不行」"><figcaption>要塞展廳裡的薩爾斯堡城市模型，牆上寫著「人沒有黃金還能活，沒有鹽卻不行」</figcaption></figure>
+<p>在要塞的展區裡，我們看到一座沙色的立體地形模型，山丘上有一座城堡；前方是一列提著燈籠、背著籃子和鎬的小礦工剪影。標籤上有「SALE PREZIOSO」（義大利文「珍貴的鹽」），說的正是這段鹽的故事——原來這座要塞本身，就蓋在鹽所累積的財富與權力之上。（展區的確切名稱我沒拍清楚，之後可以補上。）</p>
+<figure class="portrait"><img src="img/fortress-05.jpg" width="1049" height="1400" loading="lazy" alt="要塞展區裡的地形模型與提燈礦工的剪影，標籤寫著「珍貴的鹽」"><figcaption>要塞展區裡的地形模型與提燈礦工的剪影，標籤寫著「珍貴的鹽」</figcaption></figure>
+<blockquote class="verse"><p>你們是世上的鹽。鹽若失了味，怎能叫它再鹹呢？</p><cite>馬太福音 5:13（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>原來，薩爾斯堡的繁華來自一粒粒不起眼的鹽。耶穌說我們是「世上的鹽」，一點點、看似平凡，卻能保存、調味，也能成就一座城。我們也想成為這樣的人——在平凡的日子裡，讓身邊的人嚐到神的味道。</p></aside>
+<h2 id="fortress-s4">四、要塞的另一面：牢房與囚禁</h2>
+<p>要塞不只是宮殿與防禦工事，也是關人的地方。19 世紀它曾被當作兵營、倉庫和監獄，直到 1861 年才不再作為軍事要塞；第一次世界大戰時，這裡還關過戰俘。今天的導覽路線裡也有刑訊室與地牢，但那不是要塞的主要功能。</p>
+<p>最有名的囚犯，是薩爾斯堡自己的大主教——沃爾夫・迪特里希・馮・賴特瑙（Wolf Dietrich von Raitenau）。他 1587 年 28 歲就當上大主教，是個受馬基維利影響的權力人物，也是把中世紀舊城改建成巴洛克城市的人。他深愛一位平民女子莎樂美・阿爾特（Salome Alt），並想盡辦法與她結婚，兩人育有許多孩子。1611 年，他在與巴伐利亞的鹽業衝突中被捕、遭罷黜，先被關在霍亨維爾芬城堡，後來被轉到霍亨薩爾斯堡。他的堂弟兼繼任者馬庫斯・西提庫斯（Markus Sittikus）把他關在山上，直到 1617 年他死在要塞裡，再也沒有見到莎樂美和孩子。（關押年數各來源說法不一，約五到六年。）</p>
+<p>也就是說，那座為了保護大主教而蓋的要塞，最後囚禁了自己的大主教。權力可以建起高牆，卻也可能成為關住自己的牢籠。</p>
+<figure class="portrait"><img src="img/fortress-06.jpg" width="1050" height="1400" loading="lazy" alt="要塞內地面上的鐵柵與細鐵網（確切用途請以現場說明為準，可能與地牢或豎井有關）"><figcaption>要塞內地面上的鐵柵與細鐵網（確切用途請以現場說明為準，可能與地牢或豎井有關）</figcaption></figure>
+<blockquote class="verse"><p>求你領我出離被囚的地方，我好稱讚你的名；義人必環繞我，因為你是用厚恩待我。</p><cite>詩篇 142:7（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>站在這塊鐵柵旁，往下看是一片漆黑。我們想到那位曾經掌握整座城、最後卻被囚在自己城堡裡的大主教，也想到真正的自由不在權力與牆內牆外，而是在基督裡。</p></aside>
+<h2 id="fortress-s5">五、要塞也是兵營：薩爾斯堡的「自家軍團」</h2>
+<p>要塞的故事不只有大主教。官方的導覽資料提醒我們：在 20 世紀變成觀光景點之前，霍亨薩爾斯堡一直是軍事設施。拿破崙戰爭之後，薩爾斯堡經過一番轉折，在 1816 年歸入奧地利，這座要塞便成了兵營，也是薩爾斯堡「自家軍團」的基地。</p>
+<figure class="portrait"><img src="img/fortress-07.jpg" width="1049" height="1400" loading="lazy" alt="太太走在要塞內狹窄的石砌通道，頭頂是粗糙的石塊橫樑（確切位置請以現場為準）"><figcaption>太太走在要塞內狹窄的石砌通道，頭頂是粗糙的石塊橫樑（確切位置請以現場為準）</figcaption></figure>
+<p>這個軍團的全名是「皇家暨王家步兵第 59 團『萊納大公』」（k. u. k. Infanterieregiment „Erzherzog Rainer“ Nr. 59），一般簡稱「萊納團」（Rainer-Regiment）。它的歷史可以追溯到 1682 年，名字來自萊納・斐迪南大公（Archduke Rainer Ferdinand），他是奧皇法蘭茲・約瑟夫一世的再從兄弟。1816 年薩爾斯堡併入奧地利後，上奧地利的因維特爾（Innviertel）與豪斯魯克維特爾（Hausruckviertel）被劃為這個團的徵兵區。自 1924 年起，要塞裡就設有「萊納團博物館」（Rainer-Regimentsmuseum），收藏制服、武器與戰時、平時的紀念物；展廳數目各來源寫的是八間到十間不等。</p>
+<h3>從白雲石山區到蒙特奇莫內</h3>
+<p>第一次世界大戰時，萊納團跟著奧匈帝國打到義大利前線。有一份引用該團戰時日誌的研究提到：1915 年 10 月底的夜裡，這個團在南蒂羅爾白雲石山區的塞克斯滕石（Sasso di Sesto）發動了一次大規模進攻；同年冬天，日誌裡記下的是高山上的雪崩、砲擊與巡邏。另有一本以薩爾斯堡志願兵日記寫成的書，書名說的是 1916 年春夏，他隨「雪絨花師」（Edelweiß-Division）在南蒂羅爾的阿爾卑斯山一路打到蒙特奇莫內（Monte Cimone）。</p>
+<p>蒙特奇莫內（Monte Cimone di Tonezza，海拔 1,226 公尺）位於今天義大利的威尼托地區，是一戰山地坑道戰最有名的戰場之一：雙方都在山裡挖坑道、埋地雷。1916 年 9 月 23 日，奧匈軍引爆了埋在山頂下的地雷，在山頂炸出寬約 50 公尺、深約 22 公尺的彈坑；義軍在爆炸和接著的戰鬥中損失 1,137 人，其中約 500 人被俘。（我沒有查到這次引爆與萊納團之間的直接關係，這一段只當作這座山的背景。）</p>
+<figure class="portrait"><img src="img/fortress-08.jpg" width="1049" height="1400" loading="lazy" alt="要塞內的戰爭壁畫：士兵頂著長大衣、端著上刺刀的步槍，爬過滿是碎石與枯枝的山坡。說明牌只拍到最後的「…onte Cimone」，我推測畫的是這處戰場，也應是萊納團博物館的展品，請以現場說明為準"><figcaption>要塞內的戰爭壁畫：士兵頂著長大衣、端著上刺刀的步槍，爬過滿是碎石與枯枝的山坡。說明牌只拍到最後的「…onte Cimone」，我推測畫的是這處戰場，也應是萊納團博物館的展品，請以現場說明為準</figcaption></figure>
+<p>這幅畫裡沒有爆炸的火光，只有一群人低著身子往山上爬，腳下是碎石與斷木，最前面那位仰頭望向上方。戰史裡「一千多人、一個彈坑」的數字，落在畫裡，變成每個人臉上的緊張。</p>
+<p>萊納團的戰史不只這座山。有位參觀過博物館的作者寫到，一戰展區涵蓋了這個團所有的戰役，包括 1917 年的卡波雷托（Caporetto），並用立體模型呈現義大利前線與加利西亞的駐地；館內還有一座紀念碑，紀念一戰中陣亡與失蹤的萊納團士兵。另外，義大利學者整理前線碑文時，記錄過一塊由萊納團立在戰場上的碑，德文大意是：旅人啊，如果你回到薩爾斯堡，請告訴家鄉的人，我們已經倒下，忠於皇帝與土地。（資料沒有寫明這塊碑在哪一處。）</p>
+<blockquote class="verse"><p>他們要將刀打成犁頭，把槍打成鐮刀。這國不舉刀攻擊那國；他們也不再學習戰事。</p><cite>彌迦書 4:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>站在畫前，我們想到那些離開家鄉、再也沒有回到薩爾斯堡的年輕人。這座白牆下的要塞，有人曾用整個世代的生命，換來我們今天能安心旅行的和平。我們想把先知的話記在心裡：有一天，刀要打成犁頭，人也不再學習戰事。</p></aside>
+<h2 id="fortress-s6">六、牆上的主教們：哈拉赫與菲爾米安</h2>
+<p>在要塞博物館的展廳裡，一面白色大螢幕前站著三尊戴主教冠的石像，上方的紅色跑馬燈依序列出大主教的名字與在位年份。我們拍到的那一段，剛好是「Harrach 1709–1727」與「Leopold Anton Freiherr von Firmian」。（館方資料說，要塞博物館有一個主題專講「薩爾斯堡的大主教們」，這應該就是那個展區；三尊石像分別是誰，我無法從照片確認。）</p>
+<figure class="landscape"><img src="img/fortress-09.jpg" width="1400" height="1049" loading="lazy" alt="要塞博物館的大主教展示：三尊戴主教冠的石像，上方跑馬燈拍到「…Harrach 1709–1727」與「Leopold Anton Freiherr von Fir…」"><figcaption>要塞博物館的大主教展示：三尊戴主教冠的石像，上方跑馬燈拍到「…Harrach 1709–1727」與「Leopold Anton Freiherr von Fir…」</figcaption></figure>
+<h3>什麼是「大主教」？</h3>
+<p>薩爾斯堡的大主教有兩個身分：對教會，他是整個教區的屬靈領袖；對世俗，他是統治「薩爾斯堡大主教領地」的君王（諸侯），握有土地、鹽礦、軍隊與稅收，直接隸屬神聖羅馬帝國，直到 19 世紀初這個領地被世俗化為止。所以山上這座要塞，既是教會的產業，也是君王的城堡。前面說的格布哈德、克楚赫、沃爾夫・迪特里希，都是這樣的大主教。</p>
+<h3>哈拉赫（Franz Anton von Harrach，1709–1727 在位）</h3>
+<p>哈拉赫 1665 年生於維也納，出身奧地利名門。他先當過維也納主教（約 1702 至 1705 年，各資料年份略有出入），之後回到薩爾斯堡，1709 年成為大主教，1727 年 7 月過世。英文資料形容他親切、受歡迎，愛排場與慶典，並大幅擴建、翻新了米拉貝爾宮（Schloss Mirabell）。這座宮殿最早是沃爾夫・迪特里希 1606 年為莎樂美・阿爾特蓋的——也就是前一節那位被關在要塞裡的大主教，和他深愛的平民女子。從要塞往河對岸新城看，那一片白色宮殿與花園的方向，就是米拉貝爾宮。DomQuartier 還保存著他 1710 年的畫像，是一組九幅家族肖像裡唯一留下來的一幅；他本人也留下一份「Notata」日記，近年有學者整理研究。</p>
+<h3>菲爾米安（Leopold Anton von Firmian，1727–1744 在位）</h3>
+<p>菲爾米安 1679 年生於慕尼黑，出身蒂羅爾的古老貴族家族。他的舅舅約翰・恩斯特・馮・圖恩（Johann Ernst von Thun）在 1687 至 1709 年間擔任薩爾斯堡大主教——上一份紀錄裡那座大學教堂，就是在這段期間動工的。1727 年哈拉赫過世後，菲爾米安被選為大主教。和莫札特一家也有一點關係：維基百科記載，他是萊奧波德・莫札特早年的贊助者，而他的姪子卡爾・馮・菲爾米安伯爵，則是莫札特歌劇《米特里達特》的贊助者之一。</p>
+<p>但他留在歷史上最深的一筆，是 1731 年的驅逐令。薩爾斯堡的新教歷史可以追溯到 16 世紀：維基百科說，路德的思想隨著大主教馬圖斯・朗從薩克森招來的礦工傳進薩爾斯堡（就是前面 1525 年被農民與礦工圍困在要塞裡的那位）。菲爾米安上任後，想加強對偏遠山區的行政與教牧管理，引起反抗；1731 年 6 月，紐倫堡出版了一份文件，聲稱有一萬九千名受壓迫的新教徒，人數比他預料的多得多。他最後選擇用驅逐來解決：要求境內的新教徒必須離開薩爾斯堡。令的簽署日期，維基百科寫 1731 年 10 月 31 日（正好是宗教改革紀念日），百科全書則寫 11 月 11 日，各來源不一；維基百科也寫到，最短的離境期限只有八天，十二歲以下的孩子必須留下。</p>
+<p>被驅逐的人數，各資料說法是兩萬到兩萬三千人。他們大多走向北方，許多人最後被普魯士國王腓特烈・威廉一世接納，在 1732 年前後遷到普魯士。這場驅逐在當時的德語世界引起新教地區的強烈抗議，也成了新教與天主教之間記憶深刻的「傳說」；歌德的敘事詩《赫爾曼與竇綠苔》（Hermann und Dorothea）就提到過這件事。公平地說，菲爾米安與他的支持者認為這是恢復領地的信仰統一；被驅逐的人則認為，他們只是想照著良心敬拜。兩邊對這段歷史的記憶，到今天仍然不一樣。</p>
+<blockquote class="verse"><p>這些人都是存著信心死的，並沒有得著所應許的；卻從遠處望見，且歡喜迎接，又承認自己在世上是客旅，是寄居的。</p><cite>希伯來書 11:13（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>站在這些主教的名字前，我們想到一件事：宗教與權力綁在一起的時候，信仰有時保護了人，有時也讓人被迫離開家園。我們很感恩今天能自由地敬拜，也想記住那兩萬多名被迫離開家鄉的人。信仰不能被強迫，最終的家鄉也不在任何一座城堡裡，而是在神為我們預備的城。</p></aside>
+<h2 id="fortress-s7">七、最頂樓：雷克塔的 360 度全景</h2>
+<p>這趟參觀的最後一站，是要塞的最高處。官方的「全景導覽」（Panorama Tour）會帶遊客從鹽倉出發，經過地牢，最後登上雷克塔（Reckturm）的瞭望平台，被認為是城裡視野最好的地方，可以 360 度環視整座城市。</p>
+<p>11 月陰雨的天氣，雲壓得很低，遠方的阿爾卑斯山多半藏在雲後面，但近處的景色反而特別清楚：薩爾察赫河像一條銀灰色的緞帶，從舊城邊轉彎流過，兩岸是深色的屋頂和教堂尖塔。往河的另一邊看，是新城的白色建築；左邊的山坡是僧侶山（Mönchsberg）。</p>
+<figure class="landscape"><img src="img/fortress-10.jpg" width="1200" height="900" loading="lazy" alt="從最高處往下看：薩爾察赫河穿過舊城，近處是教堂的尖塔與圓頂"><figcaption>從最高處往下看：薩爾察赫河穿過舊城，近處是教堂的尖塔與圓頂</figcaption></figure>
+<figure class="portrait"><img src="img/fortress-11.jpg" width="900" height="1200" loading="lazy" alt="同一個方向，鏡頭拉高一點，可以看到河上的橋與遠方的城區"><figcaption>同一個方向，鏡頭拉高一點，可以看到河上的橋與遠方的城區</figcaption></figure>
+<p>轉向另一個方向，則是城外的住宅區與綠色的草地。畫面左邊那座白色塔樓，是要塞的一部分。</p>
+<figure class="portrait"><img src="img/fortress-12.jpg" width="900" height="1200" loading="lazy" alt="往城外看：塔樓、住宅區、綠地與遠方被雲遮住的山"><figcaption>往城外看：塔樓、住宅區、綠地與遠方被雲遮住的山</figcaption></figure>
+<p>平台的欄杆旁，有一塊黃銅色的導覽板，上面刻著周圍山景與地標的線條圖，讓遊客可以對照眼前看到的景色，這也是我們兩個人在照片裡背後的那塊金色板子。</p>
+<figure class="portrait"><img src="img/fortress-13.jpg" width="900" height="1200" loading="lazy" alt="太太在要塞最高處的平台，後面是銅製導覽圖與城外景色"><figcaption>太太在要塞最高處的平台，後面是銅製導覽圖與城外景色</figcaption></figure>
+<figure class="portrait"><img src="img/fortress-14.jpg" width="900" height="1200" loading="lazy" alt="我在同一個平台，背後是薩爾斯堡舊城與僧侶山"><figcaption>我在同一個平台，背後是薩爾斯堡舊城與僧侶山</figcaption></figure>
+<p>平台旁還有一扇木框的窗。太太戴著紅色貝雷帽，透過窗口望向河谷；窗台的圓形檯面上散落著遊客留下的硬幣，窗框上方掛著鏤空的小貓頭鷹裝飾。</p>
+<figure class="landscape"><img src="img/fortress-15.jpg" width="1400" height="1049" loading="lazy" alt="太太從木窗望出去：薩爾察赫河、舊城的屋頂，遠處是被雲遮住的山"><figcaption>太太從木窗望出去：薩爾察赫河、舊城的屋頂，遠處是被雲遮住的山</figcaption></figure>
+<blockquote class="verse"><p>我要向山舉目；我的幫助從何而來？我的幫助從造天地的耶和華而來。</p><cite>詩篇 121:1-2（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>站在最高的地方，風很大，雲很低，我們兩個人都被吹得頭髮亂亂的，可是都笑得很開心。往下看，整座城那麼小；往上看，天好像更近。我們想起：不論走多高、走多遠，真正的幫助都從造天地的神而來。</p></aside>
+<h2 id="fortress-s8">旅人小記</h2>
+<ul><li>要塞可以搭纜索鐵路（Festungsbahn）上山，也可以步行；山上風大、陰雨時很冷，記得帶外套。</li><li>票價與開放時間、套票內容請以官網為準：festung-hohensalzburg.at。</li><li>想了解鹽的歷史，可以另外去哈萊因的鹽礦（Salzwelten）。</li><li>要塞博物館（含大主教展區）與萊納團博物館都在要塞內，開放與票務細節請以官網為準。</li></ul>
+<p class="refs">參考資料：霍亨薩爾斯堡要塞官網（festung-hohensalzburg.at）、salzburg.info、Austria-Forum AEIOU〈Hohensalzburg〉、salzburg.info（Hohensalzburg Fortress、Salzburg from above）、Wikipedia〈Hohensalzburg Fortress〉〈Hallein〉、salzburg.info〈Von göttlichen Gnaden: Salzburgs Fürsten und Erzbischöfe〉、Burgen-Austria（Hohenwerfen）、Salzwelten〈History of the Salzburg Salt Mine〉、Salzburgerland.com〈Das Salz in Salzburg〉；萊納團與戰爭：salzburg.info〈Rainer Regimental Museum〉、salzburg-burgen.at〈Museums at the fortress〉、Written in the Landscape（unibz）、Wikipedia〈Monte Cimone di Tonezza〉、Roads to the Great War 部落格〈Salzburgs Rainer Regiment Museum〉、TracesOfWar；主教：Wikipedia〈Franz Anton von Harrach〉〈Leopold Anton von Firmian〉〈Salzburg Protestants〉、Encyclopedia.com〈Salzburg Expulsion〉、germanhistorydocs.org、Austria-Forum AEIOU〈Firmian〉、DomQuartier Salzburg。經文引自中文和合本。</p>
+<nav class="pn"><a href="#birthplace" data-go="birthplace"><small>上一篇</small>糧食胡同 9 號：莫札特出生的地方</a><a class="r" href="#church" data-go="church"><small>下一篇</small>薩爾斯堡大學教堂</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-church" hidden>
+  <header class="posthead"><span class="place">大學教堂 Kollegienkirche</span><h1>薩爾斯堡大學教堂</h1><p class="meta">2026 年 11 月 21 日 · 薩爾斯堡 · 約 2 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="church-s1">一、一座為大學而蓋的教堂</button></li><li><button type="button" data-scroll="church-s2">二、教堂經歷過的事</button></li><li><button type="button" data-scroll="church-s3">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>離開要塞，下山走進舊城，在一座開闊的廣場邊，看見這座純白色的巴洛克教堂：大學教堂（Kollegienkirche）。陰天裡，它的深灰色圓頂和白牆特別乾淨，旁邊是秋天轉黃的樹。</p>
+<h2 id="church-s1">一、一座為大學而蓋的教堂</h2>
+<p>薩爾斯堡的本篤會大學創立於 17 世紀 20 年代初，是大主教帕里斯・馮・洛德龍（Paris von Lodron）的事業。起初大學沒有專屬的教堂，只在大禮堂（Aula）舉行彌撒。直到 1694 年，大主教約翰・恩斯特・馮・圖恩（Johann Ernst von Thun）決定建一座大教堂，並找來當時最重要的巴洛克建築師費舍爾・馮・埃爾拉赫（Johann Bernhard Fischer von Erlach）。教堂從 1694 年蓋到 1707 年，是他在薩爾斯堡最大、也被認為最傑出的作品。</p>
+<p>更巧的是，教堂的祝聖典禮從 1707 年 11 月 20 日開始，一連舉行八天。我們今天走到這裡是 2026 年 11 月 21 日，剛好是它祝聖 319 週年的前後。教堂獻給「聖母無原罪始胎」，祭壇畫出自畫家羅特邁爾（Rottmayr）之手。</p>
+<figure class="landscape"><img src="img/church-01.jpg" width="1400" height="1050" loading="lazy" alt="陰天裡的大學教堂：深色圓頂、白色外牆與鐘塔"><figcaption>陰天裡的大學教堂：深色圓頂、白色外牆與鐘塔</figcaption></figure>
+<h2 id="church-s2">二、教堂經歷過的事</h2>
+<ul><li>1800 年左右，拿破崙的軍隊佔領薩爾斯堡，教堂一度被拿來當乾草倉庫。</li><li>1810 年，在巴伐利亞統治下，薩爾斯堡大學被關閉，教堂也失去了大學教堂的功能。</li><li>1922 年，霍夫曼斯塔爾的《大世界劇場》在這裡首演，後來成為薩爾斯堡藝術節的重要場地之一。</li><li>1960 年代大學重新開辦後，這裡又恢復了大學教堂的用途，同時也是音樂與藝術活動的場地。</li></ul>
+<p>另外，莫札特少年時和這所大學也有關係。1767 年他 11 歲時創作的拉丁文音樂劇《阿波羅與雅辛托斯》（K. 38），是在這所大學的大禮堂演出的——也就是說，他曾經在這座教堂旁邊的校園裡演出自己的作品。</p>
+<blockquote class="verse"><p>萬軍之耶和華啊，你的居所何等可愛！</p><cite>詩篇 84:1（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>一座教堂可以被拿來當倉庫、被關閉、又重新被使用，但它還是站在這裡，讓人抬頭就想到神。我們也想起自己生命中的低谷，神從不放棄，總會讓我們重新被使用。</p></aside>
+<h2 id="church-s3">旅人小記</h2>
+<ul><li>大學教堂位於大學廣場（Universitätsplatz），離莫札特出生地和糧食胡同走路不遠；廣場平日有市集。</li><li>我這次只拍了外觀，沒有進入內部，所以沒有內部照片；下次進去的話，可以特別看圓頂與祭壇。</li></ul>
+<p class="refs">參考資料：salzburg.info〈Kollegienkirche〉、Wikipedia〈Kollegienkirche, Salzburg〉、Frommer&#x27;s〈Kollegienkirche〉、Sacred Destinations、Waymarking。經文引自中文和合本。</p>
+<nav class="pn"><a href="#fortress" data-go="fortress"><small>上一篇</small>霍亨薩爾斯堡要塞與「白色黃金」</a><a class="r" href="#moderne" data-go="moderne"><small>下一篇</small>薩爾斯堡現代美術館：山上的現代藝術</a></nav>
+    </div>
+  </div>
+</article>
+<article class="post" id="view-moderne" hidden>
+  <header class="posthead"><span class="place">現代美術館 Museum der Moderne</span><h1>薩爾斯堡現代美術館：山上的現代藝術</h1><p class="meta">2026 年 11 月 21 日 · 薩爾斯堡 · 約 10 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol><li><button type="button" data-scroll="moderne-s1">一、一座蓋在懸崖邊的美術館</button></li><li><button type="button" data-scroll="moderne-s2">二、「一百年前的城市」：新即物主義展</button></li><li><button type="button" data-scroll="moderne-s3">三、鐵路看守人與小工蜂：伯克勒與凱斯特納</button></li><li><button type="button" data-scroll="moderne-s4">四、被禁止的藝術家：莫爾察恩《男人之塔》</button></li><li><button type="button" data-scroll="moderne-s5">五、風暴前的湖：奧托・迪克斯</button></li><li><button type="button" data-scroll="moderne-s6">六、現代藝術裡的太太</button></li><li><button type="button" data-scroll="moderne-s7">旅人小記</button></li></ol></nav>
+    <div class="prose">
+<p>從要塞下山之後，我們又往另一座山走：僧侶山（Mönchsberg）上的現代美術館。館裡的色彩和舊城的白牆、灰屋頂完全不同：橘色的牆、藍色的牆、紅色的牆，還有許多我們叫不出名字的作品。這一天我們在這裡走了好幾層樓。</p>
+<h2 id="moderne-s1">一、一座蓋在懸崖邊的美術館</h2>
+<p>薩爾斯堡現代美術館（Museum der Moderne Salzburg）其實有兩個館。第一個是舊城裡的「魯珀提農」（Rupertinum），建築本身是大主教帕里斯・洛德龍在 1633 年蓋的早期巴洛克建築，後來當過神學院、學生宿舍，1983 年才改成現代美術館。起因是薩爾斯堡的藝術商人弗里德里希・韋爾茨（Friedrich Welz）把私人收藏捐給邦政府，其中有許多他的好友、奧地利表現主義畫家柯克西卡（Oskar Kokoschka）的作品。</p>
+<p>第二個館就是我們今天來的僧侶山館，位於山頂的陡崖邊，地址是 Mönchsberg 32。早在 1890 年，這裡就有一家「電梯餐廳」，是僧侶山電梯的上站；1946 年起是赫赫有名的溫克勒咖啡館（Café Winkler），後來還開過賭場。1998 年舉辦國際建築競圖，由瑞士建築師盧伊吉・斯諾齊（Luigi Snozzi）擔任評審團主席，選出慕尼黑事務所 Friedrich Hoff Zwink 的設計；蓋了三年半，2004 年 10 月 23 日開幕。館內分三層，展覽空間約兩千三百平方公尺，搭僧侶山電梯上山就能到。</p>
+<figure class="portrait"><img src="img/moderne-01.jpg" width="787" height="1400" loading="lazy" alt="太太走上通往展廳的長階梯；盡頭的海報寫著「Neugier im Fluss」（流動的好奇心）與「Salzburger Kunst」（薩爾斯堡藝術），旁邊的數字是樓層指示"><figcaption>太太走上通往展廳的長階梯；盡頭的海報寫著「Neugier im Fluss」（流動的好奇心）與「Salzburger Kunst」（薩爾斯堡藝術），旁邊的數字是樓層指示</figcaption></figure>
+<p>階梯盡頭的海報，是館裡另一檔展覽：「Neugier im Fluss: Salzburger Kunst zwischen Aufbruch und Erinnerung」（流動的好奇心：在出發與記憶之間的薩爾斯堡藝術），展期是 2026 年 10 月 2 日到 2027 年 4 月 4 日，集合與薩爾斯堡有關的藝術家，探問風景、山與水，也探問啟程與記憶。我們這天主要看的是另一檔。</p>
+<blockquote class="verse"><p>因為你的財寶在那裡，你的心也在那裡。</p><cite>馬太福音 6:21（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>一座美術館從餐廳、咖啡館、賭場，變成人們來看藝術的地方。人會把時間和心放在哪裡，就會留下什麼。我們這一天把時間放在這裡，也想問自己：我們的心放在哪裡？</p></aside>
+<h2 id="moderne-s2">二、「一百年前的城市」：新即物主義展</h2>
+<p>我們看的展覽，名稱是《Am Ende des Tages. 100 Jahre Neue Sachlichkeit》，英文是「The Day Is Gone: 100 Years of the New Objectivity」，展期從 2026 年 11 月 6 日到 2027 年 2 月 28 日；我們去的時候才開展十幾天。策展人是 Marijana Schneider，策展概念出自 Noam Gal 為特拉維夫美術館（Tel Aviv Museum of Art）做的規劃，作品以 Jan E. Fischer 私人收藏為主，再加上奧地利各收藏的借展。</p>
+<p>「新即物主義」（Neue Sachlichkeit）是 1920 年代德國興起的藝術風格，名字出自 1925 年的一場展覽，所以展覽標題才說「一百年」。畫家不再像表現主義那樣大聲嘶喊，而是用冷靜、精確、近乎殘酷的眼光，畫下當時的人與城市。官方說明把這檔展覽分成幾個空間：從畫家的工作室，走到繁忙大都會的街道，進入劇院，最後走進夜晚。展品包括繪畫、紙本作品、攝影和雕塑，談的是社會變動、身分、性別角色與危機經驗。這個時代也有兩面：一邊是對速度、電影與卡巴萊的興奮，另一邊是貧窮、政治暴力與戰爭留下的創傷。</p>
+<p>展間裡有幾件深色的木雕，我們特別停下來看。橘紅色的牆前，一位母親牽著一個伸手摸著嘴的小孩；另一件是一位大人抱著孩子。刀痕留在木頭上沒有磨平，臉上的表情不漂亮，卻很真實。（這幾件木雕的作者與標題我沒有拍到說明牌，之後可以補上。）</p>
+<figure class="portrait"><img src="img/moderne-02.jpg" width="1050" height="1400" loading="lazy" alt="母親牽著孩子的木雕：粗粗的刀痕、不修飾的臉（作者待確認）"><figcaption>母親牽著孩子的木雕：粗粗的刀痕、不修飾的臉（作者待確認）</figcaption></figure>
+<figure class="portrait"><img src="img/moderne-03.jpg" width="1050" height="1400" loading="lazy" alt="抱著孩子的男人：背後橘色牆上掛著一排城市題材的畫（作者待確認）"><figcaption>抱著孩子的男人：背後橘色牆上掛著一排城市題材的畫（作者待確認）</figcaption></figure>
+<blockquote class="verse"><p>兒女是耶和華所賜的產業；所懷的胎是他所給的賞賜。</p><cite>詩篇 127:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>這些木雕不漂亮，但母親牽孩子的手、大人抱孩子的手臂，都那麼用力。我們想到：不論哪個年代、多艱難的時代，父母護著孩子的心都一樣。</p></aside>
+<h2 id="moderne-s3">三、鐵路看守人與小工蜂：伯克勒與凱斯特納</h2>
+<p>下一個展間的牆是更深的橘色。牆上用大字寫著作家埃里希・凱斯特納（Erich Kästner）1929 年的詩句，大意是：有人會同情（雖然很少）沒有錢的日子很難過，而我們這些小工蜂，卻像吃蜂蜜一樣把它吃光。字下面掛著的畫，是阿爾貝特・伯克勒（Albert Birkle）的《鐵路看守人》（Der Bahnwärter，1927，油彩紙板）。</p>
+<figure class="portrait"><img src="img/moderne-04.jpg" width="1050" height="1400" loading="lazy" alt="伯克勒《鐵路看守人》與牆上凱斯特納的詩句（Jan E. Fischer 私人收藏）"><figcaption>伯克勒《鐵路看守人》與牆上凱斯特納的詩句（Jan E. Fischer 私人收藏）</figcaption></figure>
+<p>畫裡的老人穿著藍色工作服，戴著鐵路制服帽，腰間掛著號角，手裡握著工具，背後是紅綠燈與夜空。他骨瘦如柴的臉和過大的雙手，說的是長年的勞動；他身旁的小女孩抓著他的手，睜著大眼睛看著我們。他是個把安全交給夜裡的人，旁邊卻有一個需要被保護的孩子。</p>
+<p>伯克勒 1900 年出生在柏林，一戰時服過兵役，戰後在柏林學畫，是新即物主義與德國「寫實」畫風的畫家。有資料說，他在 1932 年為了躲避納粹而搬到薩爾斯堡，1946 年成為奧地利公民，晚年做彩繪玻璃，薩爾斯堡的布拉修斯教堂（Blasiuskirche）也有他的作品，1986 年在薩爾斯堡過世。（搬到薩爾斯堡的原因與年份，各來源說法不一，這裡請以展覽說明為準。）也就是說，這位畫家在 1920 年代描繪的德國，是他後來離開的地方；薩爾斯堡則成為他的家。</p>
+<blockquote class="verse"><p>因為你的財寶在那裡，你的心也在那裡。</p><cite>馬太福音 6:21（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>凱斯特納寫的是「小工蜂」，伯克勒畫的是一位守著鐵道的老人和孩子。工蜂的日子很辛苦，卻有人在深夜為別人的平安守著。我們想起那些默默守著崗位的人，包括爸媽、也包括很多沒有被記得的人。</p></aside>
+<h2 id="moderne-s4">四、被禁止的藝術家：莫爾察恩《男人之塔》</h2>
+<p>另一個展間的牆是淡灰色，掛著一幅又高又大的畫：約翰內斯・莫爾察恩（Johannes Molzahn）1933 年的《男人之塔》（Der Turm der Männer，英文 The Tower of Men，油彩畫布）。畫裡的人物像機器人，也像由積木拼起來的人形，一個踩著一個，一直往上疊，下方的色塊像拼接的田野。</p>
+<figure class="portrait"><img src="img/moderne-05.jpg" width="1050" height="1400" loading="lazy" alt="莫爾察恩《男人之塔》，1933（Jan E. Fischer 私人收藏）"><figcaption>莫爾察恩《男人之塔》，1933（Jan E. Fischer 私人收藏）</figcaption></figure>
+<p>莫爾察恩 1892 年生於杜伊斯堡，1965 年在慕尼黑過世；一生住過十幾座城市，戰後住在威瑪，與剛成立的包浩斯學校關係密切，作品結合機械感的形狀與神祕、宗教的主題。畫這幅畫的 1933 年，是納粹上台那一年：維基百科說，他當年被禁止工作並遭到解雇，1937 年的「墮落藝術展」展出了他八件作品；1938 年他移居美國，直到 1959 年才回到德國。於是這幅「一層疊一層的人」，不只是風格，也是一個時代的氣氛：個人被塞進同一個模子裡。</p>
+<blockquote class="verse"><p>他們要將刀打成犁頭，把槍打成鐮刀。這國不舉刀攻擊那國；他們也不再學習戰事。</p><cite>彌迦書 4:3（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>一幅畫的主人，隔年就被禁止畫畫。我們想起在要塞看見的戰爭壁畫，覺得有些東西很相似：人被當成一個個零件，而聖經的盼望，是讓每個人都能被當成人。</p></aside>
+<h2 id="moderne-s5">五、風暴前的湖：奧托・迪克斯</h2>
+<p>下一件作品，讓我們停下腳步的：藍色牆上，金色畫框裡是奧托・迪克斯（Otto Dix）1939 年的《暴風雨中的博登湖景》（Bodenseelandschaft bei stürmischem Wetter，混合媒材木板）。前景是金黃的麥浪，中間是泛著黃綠色的湖水，遠方山後面，一邊是深灰的烏雲和閃電，一邊是燒紅的天空。</p>
+<figure class="landscape"><img src="img/moderne-06.jpg" width="1400" height="1050" loading="lazy" alt="迪克斯《暴風雨中的博登湖景》1939，右側是館方的說明牌（Jan E. Fischer 私人收藏）"><figcaption>迪克斯《暴風雨中的博登湖景》1939，右側是館方的說明牌（Jan E. Fischer 私人收藏）</figcaption></figure>
+<p>旁邊的說明牌（德英對照）說：迪克斯以毫不修飾的社會批判題材聞名；納粹掌權後，他的創作空間越來越小，被誣為「墮落」藝術家，許多作品被沒收；他退居博登湖畔，專心畫宗教主題與風景。說明牌認為，即使畫風已經節制，這片沒有人影的自然裡，逼近的風暴可以讀成一個預兆，因為畫成的同一年，希特勒的軍隊入侵波蘭，引爆二次大戰。</p>
+<p>迪克斯 1891 年生於格拉，1969 年在辛根過世，一戰時上過前線，也畫過最殘酷的戰爭畫。他選擇在 1939 年畫一片平靜的湖與一場暴風雨，是不是在說：有些事不必畫出人，就能讓人心裡發毛？這個問題，沒有人能替他回答。</p>
+<blockquote class="verse"><p>因為你的財寶在那裡，你的心也在那裡。</p><cite>馬太福音 6:21（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>金色的麥田、綠色的湖、紅色的天，最美的地方也正好是風暴要來的地方。我們想起要塞牆上的主教、戰爭的壁畫，還有這幅畫：歷史上很多事，都是在人以為一切安穩時發生。我們想把這份警醒放在心裡，也把平安交給神。</p></aside>
+<h2 id="moderne-s6">六、現代藝術裡的太太</h2>
+<p>除了新即物主義展，我們也走過幾個現代與當代作品的空間。有些作品的標題和作者，我們這次沒有拍到說明牌，所以先把照片和感覺留下來，等之後再補。</p>
+<figure class="portrait"><img src="img/moderne-07.jpg" width="1050" height="1400" loading="lazy" alt="太太站在一幅巨大的白色畫作前，畫面像由層層手印與筆觸組成的漩渦（作品待確認）"><figcaption>太太站在一幅巨大的白色畫作前，畫面像由層層手印與筆觸組成的漩渦（作品待確認）</figcaption></figure>
+<figure class="landscape"><img src="img/moderne-08.jpg" width="1400" height="1050" loading="lazy" alt="太太看著舊式電視裡的影像作品；牆上的「1」是樓層標示（作品待確認）"><figcaption>太太看著舊式電視裡的影像作品；牆上的「1」是樓層標示（作品待確認）</figcaption></figure>
+<figure class="landscape"><img src="img/moderne-09.jpg" width="1400" height="1050" loading="lazy" alt="半透明紗幔做成的裝置：幾何形狀與火箭般的剪影層層相疊（作品待確認）"><figcaption>半透明紗幔做成的裝置：幾何形狀與火箭般的剪影層層相疊（作品待確認）</figcaption></figure>
+<figure class="landscape"><img src="img/moderne-10.jpg" width="1400" height="1050" loading="lazy" alt="同一件裝置，太太從側面回頭看，後方還有一排發光的小燈（作品待確認）"><figcaption>同一件裝置，太太從側面回頭看，後方還有一排發光的小燈（作品待確認）</figcaption></figure>
+<figure class="landscape"><img src="img/moderne-11.jpg" width="1400" height="1050" loading="lazy" alt="黃銅板、星圖木門、藍白色的大風扇與地上的兩把木槍：這個空間的作品像把天文與戰爭放在同一個房間（作品待確認）"><figcaption>黃銅板、星圖木門、藍白色的大風扇與地上的兩把木槍：這個空間的作品像把天文與戰爭放在同一個房間（作品待確認）</figcaption></figure>
+<blockquote class="verse"><p>我要向山舉目；我的幫助從何而來？我的幫助從造天地的耶和華而來。</p><cite>詩篇 121:1-2（和合本）</cite></blockquote>
+<aside class="heart"><span>我們的感動</span><p>有些作品我們看不懂，但太太看得很認真。在一個什麼都不必懂的空間裡，我們兩個人安安靜靜地走，這也是旅行裡很美的一段時間。</p></aside>
+<h2 id="moderne-s7">旅人小記</h2>
+<ul><li>美術館在僧侶山上，從舊城可以搭僧侶山電梯（Mönchsberg Aufzug）上去；館內有觀景露台，可以俯瞰舊城。</li><li>展覽與票價、開放時間請以官網為準：museumdermoderne.at。館內常有多檔展覽同時進行。</li><li>這一篇的作品，只有伯克勒、莫爾察恩與迪克斯三件有拍到標籤；木雕與當代裝置的作者，之後補上。</li></ul>
+<p class="refs">參考資料：museumdermoderne.at（Mönchsberg 與展覽〈The Day Is Gone: 100 Years of the New Objectivity〉）、salzburg.info（Museum der Moderne Salzburg – one museum under two roofs；Neugier im Fluss）、Wikipedia〈Museum der Moderne Salzburg〉〈Johannes Molzahn〉、news.at〈Neue Sachlichkeit in Salzburg〉、Lempertz〈Albert Birkle, Der Bahnwärter〉、Kovacek、Weinpolter 與 Veryimportantlot 的伯克勒生平、館內作品說明牌（迪克斯、莫爾察恩、伯克勒、凱斯特納牆面文字，經我意譯）。經文引自中文和合本。</p>
+<nav class="pn"><a href="#church" data-go="church"><small>上一篇</small>薩爾斯堡大學教堂</a><a class="r" href="#home" data-go="home"><small>回到</small>全部文章</a></nav>
+    </div>
+  </div>
+</article>
+</main>
+<footer class="site"><div class="wrap">照片由我們自己拍攝。歷史內容整理自網路資料，各篇文末附有參考資料。</div></footer>
+
+<script>
+(function () {
+  var ids = [];
+  document.querySelectorAll('article.post').forEach(function (a) { ids.push(a.id.replace('view-', '')); });
+  function show() {
+    var h = (location.hash || '').replace('#', '');
+    if (ids.indexOf(h) < 0) h = 'home';
+    document.getElementById('view-home').hidden = (h !== 'home');
+    ids.forEach(function (i) { document.getElementById('view-' + i).hidden = (i !== h); });
+    document.getElementById('backlink').hidden = (h === 'home');
+    var t = document.querySelector('#view-' + h + ' h1');
+    document.title = (h === 'home' || !t) ? '我們的旅行回憶' : t.textContent + '｜我們的旅行回憶';
+    window.scrollTo(0, 0);
+  }
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]');
+    if (go) { e.preventDefault(); var g = go.getAttribute('data-go'); if (location.hash === '#' + g) show(); else location.hash = g; return; }
+    var sc = e.target.closest('[data-scroll]');
+    if (sc) { var el = document.getElementById(sc.getAttribute('data-scroll')); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  window.addEventListener('hashchange', show);
+  show();
+})();
+</script>
+</body>
+</html>
