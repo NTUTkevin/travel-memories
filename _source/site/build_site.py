@@ -11,6 +11,7 @@ POSTS = [
   dict(id='koenigssee', trip='koe', dirs=['國王湖'], title='國王湖：湖邊的步道，和新認識的朋友', place='國王湖 Königssee', cover=7),
   dict(id='bartholomae', trip='koe', dirs=['聖巴多羅買教堂'], title='聖巴多羅買教堂：湖上的紅色洋蔥頂', place='聖巴多羅買教堂 St. Bartholomä', cover=3, videos=[('v1','從湖上看聖巴多羅買教堂','11 月 19 日。紅色洋蔥頂的教堂與湖（地點依畫面判斷）'),('v3','船上的窗景','船上看著窗外的山與湖')]),
   dict(id='ramsau', trip='koe', dirs=['拉姆紹教堂'], title='拉姆紹教堂：霧裡的洋蔥頂', place='拉姆紹教堂 Ramsau St. Sebastian', cover=5),
+  dict(id='hallstatt', trip='hal', dirs=['哈修塔特鹽礦'], title='哈修塔特鹽礦：走進七千年的鹽山', place='哈修塔特鹽礦 Salzwelten Hallstatt', cover=9, videos=[('v5','走進克莉絲汀娜坑道','11 月 20 日。石拱門上寫著 1719 年開鑿'),('v6','坑道裡的太太','在岩壁前比手畫腳，好像在嚐鹽的味道'),('v7','坐礦車出礦坑','黑暗的坑道裡一路往外衝')]),
   dict(id='residence', dirs=['莫札特故居_上','莫札特故居_下','莫札特故居_終'], title='走進莫札特的家', place='莫札特故居 Mozart-Wohnhaus', cover=0),
   dict(id='birthplace', dirs=['莫札特出生地'], title='糧食胡同 9 號：莫札特出生的地方', place='莫札特出生地 Mozarts Geburtshaus', cover=0),
   dict(id='fortress', dirs=['薩爾斯堡_要塞'], title='霍亨薩爾斯堡要塞與「白色黃金」', place='霍亨薩爾斯堡要塞 Festung Hohensalzburg', cover=1),
@@ -18,7 +19,7 @@ POSTS = [
   dict(id='moderne', dirs=['薩爾斯堡_現代美術館'], title='薩爾斯堡現代美術館：山上的現代藝術', place='現代美術館 Museum der Moderne', cover=5),
 ]
 
-TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡')]
+TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡')]
 TRIPMAP = {k:(n,d,m) for k,n,d,m in TRIPS}
 for _p in POSTS: _p.setdefault('trip','salz')
 shutil.copytree('/home/claude/site/vid', OUT + '/vid')
@@ -108,6 +109,7 @@ for p in POSTS:
 
 # summary override text (short, in the writer's voice)
 SUMMARY = {
+  'hallstatt': '世界最古老的鹽礦。新纜車上山、1719 年的克莉絲汀娜坑道、三千年前的木樓梯、各色岩鹽，最後坐礦車回到積雪的山前。',
   'residence': '莫札特一家住了二十多年的家。從全家福牆上的母親，到一封寫給父親的信，再到維也納的十年與身後的故事。',
   'birthplace': '糧食胡同 9 號的黃色大樓，莫札特 1756 年在這裡出生。小提琴、鋼琴與黑絨枕上的小物，還有他是個怎樣的人。',
   'fortress': '九百多年的教會要塞。鹽的財富、牢房、萊納團的戰史、1731 年被驅逐的新教徒，以及最頂樓的全景。',
