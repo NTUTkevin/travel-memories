@@ -1,0 +1,18 @@
+# 每次推送到 main，就請 GitHub Pages 重新發佈網站
+# （從 Claude 推送的更新不會自動觸發 Pages，所以用這個步驟補上）
+name: 重新發佈網站
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  pages: write
+  contents: read
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 請 GitHub Pages 重新建置
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds"
