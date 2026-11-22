@@ -28,6 +28,32 @@ shutil.copytree('/home/claude/site/vid', OUT + '/vid')
 
 def esc(s): return html.escape(s, quote=True)
 
+# 每篇文章的地點（Google Maps）：第一個是地圖上顯示的主要地點，其餘只列連結
+MAPS = {
+  'koenigssee': [('國王湖碼頭 Seelände Schönau', 'Königssee Seelände, Schönau am Königssee')],
+  'bartholomae': [('聖巴多羅買教堂 St. Bartholomä', 'St. Bartholomä, Königssee')],
+  'ramsau': [('拉姆紹聖塞巴斯蒂安教堂', 'Pfarrkirche St. Sebastian, Ramsau bei Berchtesgaden')],
+  'hallstatt': [('哈修塔特鹽礦 Salzwelten Hallstatt', 'Salzwelten Hallstatt'), ('登山纜車山下站 Salzbergbahn', 'Salzbergbahn Talstation Hallstatt')],
+  'hallstatt-town': [('哈修塔特市集廣場', 'Marktplatz Hallstatt'), ('新教基督教堂', 'Evangelische Pfarrkirche Hallstatt'), ('天主教堂與人骨堂', 'Beinhaus Hallstatt'), ('明信片觀景點', 'Hallstatt Viewpoint Seestraße')],
+  'residence': [('莫札特故居 Mozart-Wohnhaus', 'Mozart-Wohnhaus, Makartplatz 8, Salzburg')],
+  'birthplace': [('莫札特出生地 Getreidegasse 9', 'Mozarts Geburtshaus, Getreidegasse 9, Salzburg')],
+  'fortress': [('霍亨薩爾斯堡要塞', 'Festung Hohensalzburg, Salzburg')],
+  'church': [('大學教堂 Kollegienkirche', 'Kollegienkirche, Universitätsplatz, Salzburg')],
+  'moderne': [('現代美術館 Mönchsberg', 'Museum der Moderne Mönchsberg, Salzburg')],
+  'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
+}
+from urllib.parse import quote_plus as _q
+def map_html(pid):
+    places = MAPS.get(pid)
+    if not places: return ''
+    name, q = places[0]
+    emb = 'https://www.google.com/maps?q=' + _q(q) + '&z=15&hl=zh-TW&output=embed'
+    links = ''.join(f'<li><a href="https://www.google.com/maps/search/?api=1&amp;query={_q(qq)}" target="_blank" rel="noopener">{esc(nn)}</a></li>' for nn, qq in places)
+    return (f'<section class="mapbox"><h2>地點地圖</h2>'
+            f'<div class="mapframe"><iframe data-src="{esc(emb)}" title="{esc(name)} 的 Google 地圖" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>'
+            f'<p class="mapnote" hidden>這個預覽頁不能嵌入地圖，請點下面的連結在 Google Maps 開啟。</p></div>'
+            f'<ul class="maplinks">{links}</ul><p class="mapsmall">點地點名稱會在 Google Maps 開啟（手機會打開 Google Maps App）。</p></section>')
+
 imgcount = {}
 def convert(post):
     parts = []
@@ -145,6 +171,7 @@ for idx, p in enumerate(POSTS):
     <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol>{toc}</ol></nav>
     <div class="prose">
 {r['body']}
+{map_html(p['id'])}
 {pn}
     </div>
   </div>

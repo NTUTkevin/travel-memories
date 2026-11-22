@@ -124,6 +124,16 @@ figcaption { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--mu
 @media (max-width: 560px) { .pn { grid-template-columns: 1fr; } body { font-size: 16.5px; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .card { transition: none; } }
 .updated { font-size: 13px; color: var(--gold); letter-spacing: .05em; margin-top: 6px; }
+.mapbox { margin: 40px 0 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+.mapframe { position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 460px; background: var(--surface); border: 1px solid var(--line); }
+.mapframe iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.mapframe.off { aspect-ratio: auto; padding: 16px; }
+.mapnote { margin: 0; font-size: 14px; }
+.prose .maplinks, .maplinks { list-style: none; padding: 0; margin: 14px 0 4px; display: flex; flex-wrap: wrap; gap: 8px; }
+.maplinks li { margin: 0; padding: 0; }
+.maplinks a { display: inline-block; padding: 9px 14px; border: 1px solid var(--gold); text-decoration: none; font-size: 15px; line-height: 1.3; }
+.maplinks a::before { content: "↗ "; color: var(--gold); }
+.mapsmall { font-size: 13px; color: var(--muted, #888); margin: 4px 0 0; }
 </style>
 </head>
 <body>
@@ -177,6 +187,16 @@ figcaption { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--mu
   window.addEventListener('hashchange', show);
   show();
 })();
+</script>
+<script>
+{ // 地圖：只在公開網站（GitHub Pages）嵌入 Google 地圖；預覽頁不允許嵌入就只顯示連結
+  const canEmbed = /github\.io$/.test(location.hostname);
+  for (const f of document.querySelectorAll('.mapframe iframe')) {
+    if (canEmbed) f.src = f.dataset.src;
+    else { f.remove(); const box = document.querySelectorAll('.mapframe'); }
+  }
+  if (!canEmbed) for (const b of document.querySelectorAll('.mapframe')) { b.classList.add('off'); b.querySelector('.mapnote').hidden = false; }
+}
 </script>
 </body>
 </html>
