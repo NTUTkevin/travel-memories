@@ -1,0 +1,154 @@
+import os, re, shutil, glob, html
+from bs4 import BeautifulSoup
+from PIL import Image
+
+SRC = '/tmp/bl'
+OUT = '/tmp/site'
+shutil.rmtree(OUT, ignore_errors=True)
+os.makedirs(OUT + '/img')
+
+POSTS = [
+  dict(id='koenigssee', trip='koe', dirs=['國王湖'], title='國王湖：湖邊的步道，和新認識的朋友', place='國王湖 Königssee', cover=7),
+  dict(id='bartholomae', trip='koe', dirs=['聖巴多羅買教堂'], title='聖巴多羅買教堂：湖上的紅色洋蔥頂', place='聖巴多羅買教堂 St. Bartholomä', cover=3, videos=[('v1','從湖上看聖巴多羅買教堂','11 月 19 日。紅色洋蔥頂的教堂與湖（地點依畫面判斷）'),('v3','船上的窗景','船上看著窗外的山與湖')]),
+  dict(id='ramsau', trip='koe', dirs=['拉姆紹教堂'], title='拉姆紹教堂：霧裡的洋蔥頂', place='拉姆紹教堂 Ramsau St. Sebastian', cover=5),
+  dict(id='residence', dirs=['莫札特故居_上','莫札特故居_下','莫札特故居_終'], title='走進莫札特的家', place='莫札特故居 Mozart-Wohnhaus', cover=0),
+  dict(id='birthplace', dirs=['莫札特出生地'], title='糧食胡同 9 號：莫札特出生的地方', place='莫札特出生地 Mozarts Geburtshaus', cover=0),
+  dict(id='fortress', dirs=['薩爾斯堡_要塞'], title='霍亨薩爾斯堡要塞與「白色黃金」', place='霍亨薩爾斯堡要塞 Festung Hohensalzburg', cover=1),
+  dict(id='church', dirs=['薩爾斯堡_大學教堂'], title='薩爾斯堡大學教堂', place='大學教堂 Kollegienkirche', cover=0),
+  dict(id='moderne', dirs=['薩爾斯堡_現代美術館'], title='薩爾斯堡現代美術館：山上的現代藝術', place='現代美術館 Museum der Moderne', cover=5),
+]
+
+TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡')]
+TRIPMAP = {k:(n,d,m) for k,n,d,m in TRIPS}
+for _p in POSTS: _p.setdefault('trip','salz')
+shutil.copytree('/home/claude/site/vid', OUT + '/vid')
+
+def esc(s): return html.escape(s, quote=True)
+
+imgcount = {}
+def convert(post):
+    parts = []
+    first_para = None
+    covers = []
+    toc = []
+    nimg = 0
+    for di, d in enumerate(post['dirs']):
+        soup = BeautifulSoup(open(f'{SRC}/{d}/body.html', encoding='utf-8').read(), 'html.parser')
+        els = [e for e in soup.contents if getattr(e, 'name', None)]
+        # drop title block
+        if els and els[0].name == 'p' and els[0].get_text(strip=True) == '旅行的生活紀錄':
+            els = els[3:]
+        i = 0
+        while i < len(els):
+            e = els[i]; n = e.name
+            if n == 'h1':
+                t = e.get_text(strip=True)
+                if t == '旅人小記' and post.get('videos'):
+                    hid = f"{post['id']}-s{len(toc)+1}"; toc.append((hid, '影片'))
+                    parts.append(f'<h2 id="{hid}">影片</h2>')
+                    parts.append('<div class="vidrow">' + ''.join(f'<figure class="vid"><video controls playsinline preload="none" poster="vid/{v}.jpg" src="vid/{v}.mp4"></video><figcaption><b>{esc(a)}</b><br>{esc(b)}</figcaption></figure>' for v,a,b in post['videos']) + '</div>')
+                hid = f"{post['id']}-s{len(toc)+1}"
+                toc.append((hid, t))
+                parts.append(f'<h2 id="{hid}">{esc(t)}</h2>')
+            elif n == 'h2':
+                parts.append(f'<h3>{esc(e.get_text(strip=True))}</h3>')
+            elif n == 'h3':
+                parts.append(f'<h4>{esc(e.get_text(strip=True))}</h4>')
+            elif n == 'p':
+                img = e.find('img')
+                txt = e.get_text(strip=True)
+                if img:
+                    src = img['src']
+                    fn = os.path.basename(src)
+                    srcpath = f'{SRC}/{d}/media/{fn}'
+                    nimg += 1
+                    name = f"{post['id']}-{nimg:02d}.jpg"
+                    shutil.copy(srcpath, f'{OUT}/img/{name}')
+                    w, h = Image.open(srcpath).size
+                    cap = ''
+                    if i+1 < len(els) and els[i+1].name == 'p' and els[i+1].find('em') and not els[i+1].find('img'):
+                        cap = els[i+1].get_text(strip=True); i += 1
+                    cls = 'portrait' if h > w else 'landscape'
+                    parts.append(f'<figure class="{cls}"><img src="img/{name}" width="{w}" height="{h}" loading="lazy" alt="{esc(cap)}"><figcaption>{esc(cap)}</figcaption></figure>')
+                    covers.append(name)
+                elif txt.startswith('參考資料'):
+                    parts.append(f'<p class="refs">{esc(txt)}</p>')
+                elif txt.startswith('我們的感動'):
+                    body = txt[len('我們的感動'):].strip()
+                    parts.append(f'<aside class="heart"><span>我們的感動</span><p>{esc(body)}</p></aside>')
+                elif '（和合本）' in txt and e.find('em'):
+                    em = e.find('em').get_text(strip=True)
+                    ref = txt[len(em):].replace('（和合本）','').replace('——','').strip(' 　')
+                    parts.append(f'<blockquote class="verse"><p>{esc(em)}</p><cite>{esc(ref)}（和合本）</cite></blockquote>')
+                else:
+                    if first_para is None and not toc: first_para = txt
+                    parts.append(f'<p>{esc(txt) if not e.find(True) else e.decode_contents()}</p>')
+            elif n == 'blockquote':
+                txt = e.get_text(' ', strip=True)
+                if txt.startswith('我們的感動'):
+                    body = txt[len('我們的感動'):].strip()
+                    parts.append(f'<aside class="heart"><span>我們的感動</span><p>{esc(body)}</p></aside>')
+                else:
+                    parts.append(f'<blockquote class="quote">{e.decode_contents()}</blockquote>')
+            elif n in ('ul', 'ol'):
+                items = ''.join(f'<li>{li.get_text(strip=True)}</li>' for li in e.find_all('li'))
+                parts.append(f'<{n}>{items}</{n}>')
+            elif n == 'table':
+                parts.append(f'<div class="tablewrap">{str(e)}</div>')
+            else:
+                parts.append(str(e))
+            i += 1
+    chars = sum(len(re.sub('<[^>]+>', '', x)) for x in parts)
+    return dict(body='\n'.join(parts), first=first_para or '', covers=covers, toc=toc, minutes=max(1, round(chars/450)), nimg=nimg)
+
+res = {}
+for p in POSTS:
+    r = convert(p); res[p['id']] = r
+    print(p['id'], 'imgs', r['nimg'], 'sections', len(r['toc']), 'min', r['minutes'], 'first:', r['first'][:30])
+
+# summary override text (short, in the writer's voice)
+SUMMARY = {
+  'residence': '莫札特一家住了二十多年的家。從全家福牆上的母親，到一封寫給父親的信，再到維也納的十年與身後的故事。',
+  'birthplace': '糧食胡同 9 號的黃色大樓，莫札特 1756 年在這裡出生。小提琴、鋼琴與黑絨枕上的小物，還有他是個怎樣的人。',
+  'fortress': '九百多年的教會要塞。鹽的財富、牢房、萊納團的戰史、1731 年被驅逐的新教徒，以及最頂樓的全景。',
+  'church': '舊城廣場邊一座純白的巴洛克教堂，為大學而蓋，也經歷過戰爭與修復。',
+  'bartholomae': '只有船能到的半島。1134 年的教堂、紅色洋蔥頂、祭壇，還有背後 1,800 公尺高的瓦茨曼東壁。',
+  'ramsau': '1512 年蓋在運鹽古道旁的教堂，溪邊的畫家角度、墓園裡的登山嚮導與《平安夜》作詞人，還有牆上的日晷。',
+  'koenigssee': '湖邊小鎮、只准電動船的湖、步道上的觀景台，還有第二天認識的新朋友宜恩。',
+  'moderne': '僧侶山上的現代美術館。新即物主義展裡的鐵路看守人、被禁止的畫家，還有暴風雨前的博登湖。',
+}
+
+cards = []
+articles = []
+for idx, p in enumerate(POSTS):
+    r = res[p['id']]
+    cover = r['covers'][p['cover']] if r['covers'] else ''
+    cards.append(f'''<a class="card" href="#{p['id']}" data-go="{p['id']}">
+  <div class="cardimg"><img src="img/{cover}" alt="" loading="lazy"></div>
+  <div class="cardtxt"><span class="place">{esc(p['place'])}</span><h3>{esc(p['title'])}</h3><p>{esc(SUMMARY[p['id']])}</p><span class="meta">約 {r['minutes']} 分鐘 · {r['nimg']} 張照片</span></div></a>''')
+    toc = ''.join(f'<li><button type="button" data-scroll="{hid}">{esc(t)}</button></li>' for hid, t in r['toc'])
+    prev = POSTS[idx-1] if idx > 0 else None
+    nxt = POSTS[idx+1] if idx < len(POSTS)-1 else None
+    pn = '<nav class="pn">'
+    pn += f'<a href="#{prev["id"]}" data-go="{prev["id"]}"><small>上一篇</small>{esc(prev["title"])}</a>' if prev else '<span></span>'
+    pn += f'<a class="r" href="#{nxt["id"]}" data-go="{nxt["id"]}"><small>下一篇</small>{esc(nxt["title"])}</a>' if nxt else '<a class="r" href="#home" data-go="home"><small>回到</small>全部文章</a>'
+    pn += '</nav>'
+    articles.append(f'''<article class="post" id="view-{p['id']}" hidden>
+  <header class="posthead"><span class="place">{esc(p['place'])}</span><h1>{esc(p['title'])}</h1><p class="meta">{TRIPMAP[p['trip']][2]} · 約 {r['minutes']} 分鐘</p></header>
+  <div class="postgrid">
+    <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol>{toc}</ol></nav>
+    <div class="prose">
+{r['body']}
+{pn}
+    </div>
+  </div>
+</article>''')
+
+trips_html = ''
+for k,n,d,m in TRIPS:
+    cs = [c for c,p in zip(cards,POSTS) if p['trip']==k]
+    if cs: trips_html += f'  <section class="trip">\n    <div class="triphead"><h2>{n}</h2><span>{d}</span></div>\n    <div class="grid">\n' + '\n'.join(cs) + '\n    </div>\n  </section>\n'
+TEMPLATE = open('/home/claude/site/template.html', encoding='utf-8').read()
+out = TEMPLATE.replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
+open(f'{OUT}/index.html', 'w', encoding='utf-8').write(out)
+print(os.path.getsize(f'{OUT}/index.html'), 'bytes html')
