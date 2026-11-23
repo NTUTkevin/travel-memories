@@ -19,9 +19,10 @@ POSTS = [
   dict(id='church', dirs=['薩爾斯堡_大學教堂'], title='薩爾斯堡大學教堂', place='大學教堂 Kollegienkirche', cover=0),
   dict(id='moderne', dirs=['薩爾斯堡_現代美術館'], title='薩爾斯堡現代美術館：山上的現代藝術', place='現代美術館 Museum der Moderne', cover=5),
   dict(id='christmas', dirs=['薩爾斯堡聖誕市集'], title='薩爾斯堡聖誕市集：五百年的冬夜燈火', place='聖誕市集 Salzburger Christkindlmarkt', cover=1, videos=[('v8','僧侶山上的夜景','11 月 21 日傍晚，從僧侶山看老城和要塞'),('v9','乾杯！','市集的熱飲杯'),('v10','莫札特廣場溜冰場','Eiszauber 溜冰場的燈光'),('v11','回程的小巷','掛著聖誕燈飾的老城巷子')]),
+  dict(id='vienna-home', trip='vie', dirs=['維也納_中央車站旁的家'], title='抵達維也納：中央車站旁的家', place='維也納中央車站 Wien Hauptbahnhof', cover=4),
 ]
 
-TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡')]
+TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡'),('vie','奧地利・維也納','2026 年 11 月 22 日起','2026 年 11 月 22 日起 · 維也納')]
 TRIPMAP = {k:(n,d,m) for k,n,d,m in TRIPS}
 for _p in POSTS: _p.setdefault('trip','salz')
 shutil.copytree('/home/claude/site/vid', OUT + '/vid')
@@ -40,6 +41,7 @@ MAPS = {
   'fortress': [('霍亨薩爾斯堡要塞', 'Festung Hohensalzburg, Salzburg')],
   'church': [('大學教堂 Kollegienkirche', 'Kollegienkirche, Universitätsplatz, Salzburg')],
   'moderne': [('現代美術館 Mönchsberg', 'Museum der Moderne Mönchsberg, Salzburg')],
+  'vienna-home': [('維也納中央車站 Wien Hauptbahnhof', 'Wien Hauptbahnhof')],
   'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
 }
 from urllib.parse import quote_plus as _q
@@ -137,6 +139,7 @@ for p in POSTS:
 
 # summary override text (short, in the writer's voice)
 SUMMARY = {
+  'vienna-home': '旅程最後一站。住在中央車站旁的頂樓公寓：從舊南站到菱形屋頂的新車站、「工人區」法沃里滕、「便宜商店」BILLA 的故事，和太太煮的曾拌麵晚餐。',
   'christmas': '從 1491 年的雜貨市集開始的聖誕市集。僧侶山夜景、一杯熱紅酒和紀念杯、莫札特廣場溜冰場，還有《平安夜》作詞者在薩爾斯堡的童年。',
   'hallstatt-town': '「鹽的地方」湖邊小鎮。1750 年的大火、為信仰半夜上船離鄉的新教徒、山坡上的人骨堂，還有明信片角度的合照。',
   'hallstatt': '世界最古老的鹽礦。新纜車上山、1719 年的克莉絲汀娜坑道、三千年前的木樓梯、各色岩鹽，最後坐礦車回到積雪的山前。',
