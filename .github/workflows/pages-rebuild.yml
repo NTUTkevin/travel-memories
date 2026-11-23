@@ -1,5 +1,4 @@
-# 每次推送到 main，就把網站發佈到 GitHub Pages
-# 需要在 GitHub：Settings → Pages → Build and deployment → Source 選「GitHub Actions」
+# 每次推送到 main，就把網站發佈到 GitHub Pages（GitHub 官方範本的寫法：先打包、再發佈）
 name: 發佈網站
 on:
   push:
@@ -9,19 +8,25 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
   deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
       - id: deployment
         uses: actions/deploy-pages@v4
