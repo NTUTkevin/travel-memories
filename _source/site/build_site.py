@@ -186,12 +186,17 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）'}
 trips_html = ''
+quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
     cs = [c for c,p in zip(cards,POSTS) if p['trip']==k]
+    ps = [p for p in POSTS if p['trip']==k]
+    if ps: quick_html += f'    <div class="qrow"><span class="qtrip">{n}</span>' + ''.join(f'<a href="#{p["id"]}" data-go="{p["id"]}">{esc(SHORT.get(p["id"], p["title"]))}</a>' for p in ps) + '</div>\n'
     if cs: trips_html += f'  <section class="trip">\n    <div class="triphead"><h2>{n}</h2><span>{d}</span></div>\n    <div class="grid">\n' + '\n'.join(cs) + '\n    </div>\n  </section>\n'
 TEMPLATE = open('/home/claude/site/template.html', encoding='utf-8').read()
-out = TEMPLATE.replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
+quick_html += '  </nav>\n'
+out = TEMPLATE.replace('{{QUICK}}', quick_html).replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
 # 快取更新：每次重建都給圖片與影片加上版本號，並請瀏覽器重新檢查網頁
 import re as _re, time as _time
 import datetime as _dt, zoneinfo as _zi

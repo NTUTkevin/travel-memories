@@ -53,6 +53,14 @@ img { max-width: 100%; height: auto; display: block; }
 .eyebrow { font-family: var(--latin); font-style: italic; font-weight: 500; font-size: 20px; color: var(--gold); letter-spacing: .02em; }
 .hero h1 { font-size: clamp(34px, 7vw, 56px); line-height: 1.25; margin: 6px 0 16px; letter-spacing: .04em; text-wrap: balance; }
 .hero p { margin: 0; color: var(--muted); font-size: 18px; max-width: 34em; }
+.quick { border: 1px solid var(--line); background: var(--surface); padding: 14px 18px 16px; margin: 0 0 8px; }
+.quick b.qt { display: block; font-size: 15px; color: var(--gold); letter-spacing: .1em; margin-bottom: 6px; }
+.qrow { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 10px; padding: 6px 0; border-top: 1px dashed var(--line); }
+.qrow:first-of-type { border-top: 0; }
+.qrow .qtrip { flex: 0 0 auto; min-width: 9.5em; font-size: 14px; color: var(--muted); }
+.qrow a { text-decoration: none; font-size: 15px; line-height: 1.5; padding: 4px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--bg); }
+.qrow a:hover { border-color: var(--gold); color: var(--gold); }
+@media (max-width: 600px) { .qrow .qtrip { min-width: 100%; } .qrow a { font-size: 14px; padding: 4px 10px; } }
 .trip { padding: 36px 0 8px; }
 .vidrow { display:flex; flex-wrap:wrap; gap:18px; margin:18px 0 8px; }
 .fbgrid { display:flex; flex-wrap:wrap; gap:20px; }
@@ -150,6 +158,7 @@ figcaption { margin-top: 8px; font-size: 14px; line-height: 1.7; color: var(--mu
     <p>我和太太一起走過的地方。每到一個景點，先查清楚它的歷史，再放上我們拍的照片、一節經文，和那一刻的感動。</p>
     <p class="updated">最後更新：__UPDATED__（奧地利時間）</p>
   </div>
+{{QUICK}}
 {{TRIPS}}
   <p class="next">下一個地方還在路上，走到哪裡，就記到哪裡。</p>
 </section>
