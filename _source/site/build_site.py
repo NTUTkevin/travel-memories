@@ -22,6 +22,7 @@ POSTS = [
   dict(id='vienna-home', trip='vie', dirs=['維也納_中央車站旁的家'], title='抵達維也納：中央車站旁的家', place='維也納中央車站 Wien Hauptbahnhof', cover=4),
   dict(id='schoenbrunn-out', trip='vie', dirs=['維也納_美泉宮_室外'], title='美泉宮（室外）：凱旋門、花園與維也納的第一場雪', place='美泉宮凱旋門 Gloriette', cover=4, videos=[('v12','聖誕樹下接雪花','11 月 23 日 13:51，美泉宮前的聖誕市集下起了雪')]),
   dict(id='schoenbrunn-in', trip='vie', dirs=['維也納_美泉宮_室內'], title='美泉宮（室內）：走進皇帝與西西的夏宮', place='美泉宮 Schloss Schönbrunn', cover=7),
+  dict(id='cafe-birthday', trip='vie', dirs=['維也納_咖啡館裡的生日'], title='咖啡館裡的生日：維也納的下午與夜晚', place='Café Diglas・卡爾廣場聖誕市集', cover=0, videos=[('v15','太太的蛋糕時間','11 月 23 日 14:53，Café Diglas'),('v16','生日的印度朋友','15:01，在咖啡館併桌聊天')]),
   dict(id='musikverein', trip='vie', dirs=['維也納_金色大廳莫札特音樂會'], title='金色大廳：在音樂的神殿聽莫札特', place='愛樂協會金色大廳 Musikverein', cover=3, videos=[('v13','全場起立鼓掌','11 月 23 日 22:01，演出結束後的掌聲'),('v14','穿古裝的謝幕','22:03，樂手和歌手在台上一起謝幕')]),
 ]
 
@@ -47,6 +48,7 @@ MAPS = {
   'vienna-home': [('維也納中央車站 Wien Hauptbahnhof', 'Wien Hauptbahnhof')],
   'schoenbrunn-out': [('凱旋門 Gloriette', 'Gloriette, Schönbrunn, Wien'), ('美泉宮聖誕市集（榮譽庭院）', 'Weihnachtsmarkt Schloss Schönbrunn, Wien')],
   'schoenbrunn-in': [('美泉宮 Schloss Schönbrunn', 'Schloss Schönbrunn, Wien')],
+  'cafe-birthday': [('Café Diglas', 'Café Diglas, Wollzeile 10, Wien'), ('卡爾廣場聖誕市集 Art Advent', 'Art Advent Karlsplatz, Wien')],
   'musikverein': [('維也納愛樂協會 Musikverein', 'Musikverein Wien, Musikvereinsplatz 1')],
   'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
 }
@@ -145,6 +147,7 @@ for p in POSTS:
 
 # summary override text (short, in the writer's voice)
 SUMMARY = {
+  'cafe-birthday': '1923 年的老咖啡館 Diglas 沒有位子，併桌認識了一個人來維也納慶生的印度朋友；晚餐一大盤肋排，再到卡爾廣場的聖誕市集看小羊。',
   'musikverein': '晚上走進新年音樂會的那座金色大廳：1812 年的音樂之友協會、漢森設計的「音樂神殿」、女像柱與繆思天花板，還有穿著古裝、戴假髮演出的莫札特音樂會。',
   'schoenbrunn-out': '爬上山丘頂的凱旋門：1775 年為「正義之戰」蓋的榮耀殿堂，從上面俯瞰黃色的宮殿和整座維也納；下午回到宮殿前的聖誕市集，遇上了維也納的第一場雪。',
   'schoenbrunn-in': '哈布斯堡的夏宮：特羅格畫的〈瑪利亞的婚禮〉、法蘭茲・約瑟夫和西西的房間、六歲莫札特演奏過的鏡廳、43 公尺長的金色大廳，還有中國漆器廳與百萬廳。',
@@ -189,7 +192,7 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
-SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','musikverein':'金色大廳莫札特音樂會'}
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會'}
 trips_html = ''
 quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
