@@ -188,12 +188,19 @@ for idx, p in enumerate(POSTS):
     toc = ''.join(f'<li><button type="button" data-scroll="{hid}">{esc(t)}</button></li>' for hid, t in r['toc'])
     prev = POSTS[idx-1] if idx > 0 else None
     nxt = POSTS[idx+1] if idx < len(POSTS)-1 else None
-    pn = '<nav class="pn">'
-    pn += f'<a href="#{prev["id"]}" data-go="{prev["id"]}"><small>上一篇</small>{esc(prev["title"])}</a>' if prev else '<span></span>'
-    pn += f'<a class="r" href="#{nxt["id"]}" data-go="{nxt["id"]}"><small>下一篇</small>{esc(nxt["title"])}</a>' if nxt else '<a class="r" href="#home" data-go="home"><small>回到</small>全部文章</a>'
+    def _cv(q):
+        rr = res[q['id']]; return rr['covers'][q['cover']] if rr['covers'] else ''
+    pn = '<nav class="pn" aria-label="上一篇與下一篇">'
+    pn += f'<a href="#{prev["id"]}" data-go="{prev["id"]}"><img src="img/{_cv(prev)}" alt="" loading="lazy"><span><small>上一篇</small>{esc(prev["title"])}</span></a>' if prev else '<span></span>'
+    pn += f'<a class="r" href="#{nxt["id"]}" data-go="{nxt["id"]}"><span><small>下一篇</small>{esc(nxt["title"])}</span><img src="img/{_cv(nxt)}" alt="" loading="lazy"></a>' if nxt else '<a class="r" href="#home" data-go="home"><span><small>回到</small>全部文章</span></a>'
     pn += '</nav>'
+    tn = '<nav class="tn" aria-label="快速切換文章">'
+    tn += f'<a href="#{prev["id"]}" data-go="{prev["id"]}">‹ 上一篇</a>' if prev else '<span></span>'
+    tn += f'<button type="button" class="share" data-share="{p["id"]}" data-title="{esc(p["title"])}">分享這篇</button>'
+    tn += f'<a href="#{nxt["id"]}" data-go="{nxt["id"]}">下一篇 ›</a>' if nxt else '<a href="#home" data-go="home">全部文章 ›</a>'
+    tn += '</nav>'
     articles.append(f'''<article class="post" id="view-{p['id']}" hidden>
-  <header class="posthead"><span class="place">{esc(p['place'])}</span><h1>{esc(p['title'])}</h1><p class="meta">{TRIPMAP[p['trip']][2]} · 約 {r['minutes']} 分鐘</p></header>
+  <header class="posthead"><span class="place">{esc(p['place'])}</span><h1>{esc(p['title'])}</h1><p class="meta">{TRIPMAP[p['trip']][2]} · 約 {r['minutes']} 分鐘</p>{tn}</header>
   <div class="postgrid">
     <nav class="toc" aria-label="本篇章節"><b>本篇章節</b><ol>{toc}</ol></nav>
     <div class="prose">
@@ -212,9 +219,49 @@ for k,n,d,m in TRIPS:
     ps = [p for p in POSTS if p['trip']==k]
     if ps: quick_html += f'    <div class="qrow"><span class="qtrip">{n}</span>' + ''.join(f'<a href="#{p["id"]}" data-go="{p["id"]}">{esc(SHORT.get(p["id"], p["title"]))}</a>' for p in ps) + '</div>\n'
     if cs: trips_html += f'  <section class="trip">\n    <div class="triphead"><h2>{n}</h2><span>{d}</span></div>\n    <div class="grid">\n' + '\n'.join(cs) + '\n    </div>\n  </section>\n'
+
+# ===== 旅程路線地圖（首頁）：國界是 Natural Earth（world-atlas）資料，事先投影成 SVG =====
+import json as _json
+_RM = _json.load(open('/home/claude/site/routemap.json', encoding='utf-8'))
+_LBL = {'koe': (-12, 24, 'end'), 'salz': (-12, -12, 'end'), 'hal': (12, 22, 'start'), 'vie': (0, -18, 'middle'), 'bud': (0, 28, 'middle')}
+def route_html():
+    W, H = _RM['W'], _RM['H']
+    cs = {c['key']: c for c in _RM['cities']}
+    order = [k for k, *_ in TRIPS if k in cs]
+    svg = [f'<svg class="rmap" viewBox="85 95 655 210" role="img" aria-label="旅程路線地圖：' + ' → '.join(cs[k]['name'] for k in order) + '">']
+    for c in _RM['countries']:
+        cls = 'at' if c['name'] == 'Austria' else ('de' if c['name'] == 'Germany' else 'oth')
+        svg.append(f'<path class="cty {cls}" d="{c["d"]}"/>')
+    for c in _RM['countries']:
+        if c['label'] and c['zh']:
+            svg.append(f'<text class="ctl{" atl" if c["name"]=="Austria" else ""}" x="{c["label"][0]}" y="{c["label"][1]}">{c["zh"]}</text>')
+    pts = ' '.join(f'{cs[k]["xy"][0]},{cs[k]["xy"][1]}' for k in order)
+    svg.append(f'<polyline class="rline" points="{pts}"/>')
+    nx = [c for c in _RM['cities'] if c.get('next')]
+    for c in nx:
+        a = cs[order[-1]]['xy']; svg.append(f'<line class="rnext" x1="{a[0]}" y1="{a[1]}" x2="{c["xy"][0]}" y2="{c["xy"][1]}"/>')
+    for i, k in enumerate(order + [c['key'] for c in nx]):
+        c = cs[k]; x, y = c['xy']; dx, dy, an = _LBL.get(k, (0, -16, 'middle'))
+        num = '?' if c.get('next') else str(i + 1)
+        svg.append(f'<g class="stop{" nx" if c.get("next") else ""}" data-stop="{k}" tabindex="0" role="button" aria-label="{c["name"]} {c["date"]}">'
+                   f'<circle class="hit" cx="{x}" cy="{y}" r="22"/><circle class="dot" cx="{x}" cy="{y}" r="11"/><text class="num" x="{x}" y="{y+4.5}">{num}</text>'
+                   f'<text class="sl" x="{x+dx}" y="{y+dy}" text-anchor="{an}">{c["name"]}<tspan class="sd" dx="6">{c["date"]}</tspan></text></g>')
+    svg.append('</svg>')
+    panels = ''
+    for k in order + [c['key'] for c in nx]:
+        c = cs[k]; ps = [q for q in POSTS if q['trip'] == k]
+        if ps:
+            chips = ''.join(f'<a href="#{q["id"]}" data-go="{q["id"]}">{esc(SHORT.get(q["id"], q["title"]))}</a>' for q in ps)
+            panels += f'<div class="rpanel" data-panel="{k}" hidden><b>{c["name"]} {c["de"]}<span>{c["date"]} · {len(ps)} 篇</span></b><div class="rchips">{chips}</div></div>'
+        else:
+            panels += f'<div class="rpanel" data-panel="{k}" hidden><b>{c["name"]} {c["de"]}<span>{c["date"]}</span></b><p>下一站，照片還在路上。</p></div>'
+    return ('<section class="route"><div class="triphead"><h2>旅程路線</h2><span>點地圖上的城市，看那一站的文章</span></div>'
+            '<div class="rbox">' + ''.join(svg) + '</div>' + panels +
+            '<p class="rhint" data-panel="none">點上面的 ①②③④，就會列出那一站的文章。</p>'
+            '<p class="rsrc">地圖國界：Natural Earth（公有領域）。</p></section>\n')
 TEMPLATE = open('/home/claude/site/template.html', encoding='utf-8').read()
 quick_html += '  </nav>\n'
-out = TEMPLATE.replace('{{QUICK}}', quick_html).replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
+out = TEMPLATE.replace('{{QUICK}}', quick_html + route_html()).replace('{{TRIPS}}', trips_html).replace('{{ARTICLES}}', '\n'.join(articles))
 # 快取更新：每次重建都給圖片與影片加上版本號，並請瀏覽器重新檢查網頁
 import re as _re, time as _time
 import datetime as _dt, zoneinfo as _zi
@@ -225,5 +272,43 @@ out = _re.sub(r'((?:img|vid)/[^"?\s]+\.(?:jpg|jpeg|png|mp4))(?=")', r'\1?v=' + _
 _meta = '<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">'
 if 'http-equiv="Cache-Control"' not in out:
     out = out.replace('<meta charset="utf-8">', '<meta charset="utf-8">' + _meta, 1)
+
+# ===== 分享預覽：每篇一個 p/<id>.html，給 LINE／臉書讀封面、標題與簡介，打開後自動跳到文章 =====
+BASE = 'https://ntutkevin.github.io/travel-memories/'
+os.makedirs(f'{OUT}/p', exist_ok=True); os.makedirs(f'{OUT}/og', exist_ok=True)
+def og_image(src, dst):
+    im = Image.open(src).convert('RGB'); w, h = im.size
+    tw = min(w, 1200); th = round(tw / 1.91)
+    sc = max(tw / w, th / h); im = im.resize((round(w * sc), round(h * sc)), Image.LANCZOS)
+    w, h = im.size; x = (w - tw) // 2; y = int((h - th) * 0.35)
+    im.crop((x, y, x + tw, y + th)).save(dst, quality=82)
+    return tw, th
+def share_page(pid, title, desc, img, iw, ih, target):
+    t, d = esc(title), esc(desc)
+    return f"""<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{t}</title><meta name="description" content="{d}">
+<meta property="og:type" content="article"><meta property="og:site_name" content="我們的旅行回憶">
+<meta property="og:title" content="{t}"><meta property="og:description" content="{d}">
+<meta property="og:url" content="{BASE}p/{pid}.html"><meta property="og:image" content="{BASE}og/{img}?v={_ver}">
+<meta property="og:image:width" content="{iw}"><meta property="og:image:height" content="{ih}"><meta property="og:locale" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<style>body{{font-family:serif;background:#eceff2;color:#1c2330;text-align:center;padding:40px 20px}}img{{max-width:100%;height:auto}}a{{color:#8a6a2f}}</style>
+<script>location.replace('../{target}');</script></head>
+<body><p><img src="../og/{img}" alt=""></p><h1 style="font-size:22px">{t}</h1><p><a href="../{target}">繼續閱讀 →</a></p></body></html>"""
+_home_cover = None
+for p in POSTS:
+    r = res[p['id']]
+    if not r['covers']: continue
+    cv = r['covers'][p['cover']]
+    iw, ih = og_image(f'{OUT}/img/{cv}', f'{OUT}/og/{p["id"]}.jpg')
+    open(f'{OUT}/p/{p["id"]}.html', 'w', encoding='utf-8').write(share_page(p['id'], p['title'] + '｜我們的旅行回憶', SUMMARY[p['id']], f'{p["id"]}.jpg', iw, ih, '#' + p['id']))
+    if p['id'] == 'schoenbrunn-out': _home_cover = (p['id'], iw, ih)
+if not _home_cover: _home_cover = (POSTS[-1]['id'], iw, ih)
+_home_desc = '我和太太一起走過的地方：德國國王湖、哈修塔特、薩爾斯堡、維也納。每個景點先查歷史，再放上照片、一節經文和那一刻的感動。'
+_og_home = (f'<meta name="description" content="{esc(_home_desc)}"><meta property="og:type" content="website"><meta property="og:site_name" content="我們的旅行回憶">'
+            f'<meta property="og:title" content="我們的旅行回憶"><meta property="og:description" content="{esc(_home_desc)}"><meta property="og:url" content="{BASE}">'
+            f'<meta property="og:image" content="{BASE}og/{_home_cover[0]}.jpg?v={_ver}"><meta property="og:image:width" content="{_home_cover[1]}"><meta property="og:image:height" content="{_home_cover[2]}">'
+            '<meta property="og:locale" content="zh_TW"><meta name="twitter:card" content="summary_large_image">')
+out = out.replace('<meta name="viewport"', _og_home + '<meta name="viewport"', 1)
 open(f'{OUT}/index.html', 'w', encoding='utf-8').write(out)
 print(os.path.getsize(f'{OUT}/index.html'), 'bytes html')
