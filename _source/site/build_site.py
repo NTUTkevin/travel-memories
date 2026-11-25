@@ -27,6 +27,7 @@ POSTS = [
   dict(id='hofburg', trip='vie', dirs=['維也納_霍夫堡與西西博物館'], title='霍夫堡與西西博物館：皇帝的辦公室，皇后的傳說', place='霍夫堡 Hofburg・西西博物館 Sisi Museum', cover=1, videos=[('v17','謁見等候廳的三幅巨畫','11 月 24 日 10:12，克拉夫特畫的法蘭茲一世與大水晶吊燈')]),
   dict(id='moebel', trip='vie', dirs=['維也納_家具博物館'], title='維也納家具博物館：皇帝的家具倉庫與《茜茜公主》的片場', place='家具博物館 Möbelmuseum Wien', cover=2),
   dict(id='sisipass', trip='vie', dirs=['維也納_SisiPass三館'], title='Sisi Pass：一張票，跟著西西走三個地方', place='Sisi Pass 美泉宮・西西博物館・家具博物館', cover=1),
+  dict(id='rathaus-xmas', trip='vie', dirs=['維也納_市政廳聖誕市集'], title='市政廳聖誕市集：維也納最盛大的聖誕夜色', place='市政廳聖誕市集 Wiener Christkindlmarkt', cover=0, videos=[('v18','星星樹下的太太','17:39，市政廳公園裡掛滿星星的燈樹，最後鏡頭帶到市政廳鐘樓'),('v19','熊樂團','17:41，公園小木屋裡會動的熊樂團，唱歌、吹喇叭、彈吉他'),('v20','還願教堂的「光的無限」','18:00，還願教堂兩座塔之間的紅色無限符號')]),
 ]
 
 TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡'),('vie','奧地利・維也納','2026 年 11 月 22 日起','2026 年 11 月 22 日起 · 維也納')]
@@ -55,6 +56,7 @@ MAPS = {
   'musikverein': [('維也納愛樂協會 Musikverein', 'Musikverein Wien, Musikvereinsplatz 1')],
   'hofburg': [('西西博物館（霍夫堡）', 'Sisi Museum Hofburg, Michaelerkuppel, Wien'), ('米歇爾廣場羅馬遺跡', 'Ausgrabungen Michaelerplatz, Wien'), ('聖米迦勒教堂', 'Michaelerkirche, Michaelerplatz, Wien')],
   'moebel': [('維也納家具博物館 Möbelmuseum Wien', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
+  'rathaus-xmas': [('維也納市政廳聖誕市集', 'Wiener Christkindlmarkt Rathausplatz, Wien'), ('愛心樹（市政廳公園）', 'Rathauspark Wien'), ('城堡劇院 Burgtheater', 'Burgtheater, Universitätsring 2, Wien'), ('還願教堂 Votivkirche', 'Votivkirche, Rooseveltplatz, Wien')],
   'sisipass': [('美泉宮 Schönbrunn', 'Schloss Schönbrunn, Wien'), ('西西博物館（霍夫堡）', 'Sisi Museum Hofburg, Michaelerkuppel, Wien'), ('維也納家具博物館', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
   'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
 }
@@ -157,6 +159,7 @@ SUMMARY = {
   'musikverein': '晚上走進新年音樂會的那座金色大廳：1812 年的音樂之友協會、漢森設計的「音樂神殿」、女像柱與繆思天花板，還有穿著古裝、戴假髮演出的莫札特音樂會。',
   'hofburg': '走進哈布斯堡的冬宮：克拉夫特畫的「好皇帝法蘭茲」、法蘭茲・約瑟夫 1910 年的謁見名單、西西的體操室，剛重新開幕的西西博物館，還有 30 公尺長的米蘭桌飾。',
   'moebel': '瑪麗亞・特蕾莎 1747 年設立的宮廷家具倉庫：皇帝的寶座、皇太子魯道夫的搖籃、畢德麥雅的小房間，還有《茜茜公主》電影裡用過的真家具。',
+  'rathaus-xmas': '維也納最大的聖誕市集：從七百年前的「十二月市集」說起，市政廳人和比還願教堂矮一公尺的塔、愛心樹、來自福拉爾貝格的 31 公尺聖誕樹，還有還願教堂上的「光的無限」。',
   'sisipass': '一張 Sisi Pass 走完美泉宮、霍夫堡西西博物館和家具博物館：包含什麼、怎麼預約、2026 新票價季算一算划不划算，還有我們的路線。',
   'schoenbrunn-out': '爬上山丘頂的凱旋門：1775 年為「正義之戰」蓋的榮耀殿堂，從上面俯瞰黃色的宮殿和整座維也納；下午回到宮殿前的聖誕市集，遇上了維也納的第一場雪。',
   'schoenbrunn-in': '哈布斯堡的夏宮：特羅格畫的〈瑪利亞的婚禮〉、法蘭茲・約瑟夫和西西的房間、六歲莫札特演奏過的鏡廳、43 公尺長的金色大廳，還有中國漆器廳與百萬廳。',
@@ -201,7 +204,7 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
-SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略'}
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集'}
 trips_html = ''
 quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
