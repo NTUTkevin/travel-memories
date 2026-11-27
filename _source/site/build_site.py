@@ -30,6 +30,7 @@ POSTS = [
   dict(id='rathaus-xmas', trip='vie', dirs=['維也納_市政廳聖誕市集'], title='市政廳聖誕市集：維也納最盛大的聖誕夜色', place='市政廳聖誕市集 Wiener Christkindlmarkt', cover=0, videos=[('v18','星星樹下的太太','17:39，市政廳公園裡掛滿星星的燈樹，最後鏡頭帶到市政廳鐘樓'),('v19','熊樂團','17:41，公園小木屋裡會動的熊樂團，唱歌、吹喇叭、彈吉他'),('v20','還願教堂的「光的無限」','18:00，還願教堂兩座塔之間的紅色無限符號')]),
   dict(id='buda-castle', trip='bud', dirs=['布達佩斯_布達城堡雪景'], title='布達城堡：下雪了，皇宮山丘上的白色早晨', place='布達城堡 Budavári Palota', cover=1, videos=[('v22','圓頂下的雪','11 月 26 日 11:22，國家美術館大圓頂前不停落下的雪'),('v23','撐粉紅傘的太太','11:47，歐根親王雕像下的積雪石牆前')]),
   dict(id='budapest-history', trip='bud', dirs=['布達佩斯_歷史博物館'], title='布達佩斯歷史博物館：聖伊什特萬廳與地底的中世紀王宮', place='布達佩斯歷史博物館 Vármúzeum', cover=2),
+  dict(id='fishermans-bastion', trip='bud', dirs=['布達佩斯_漁人堡與馬加什教堂'], title='漁人堡與馬加什教堂：雪人、聖誕樹和七座白塔', place='漁人堡 Halászbástya・馬加什教堂', cover=5),
   dict(id='budapest-m1', trip='bud', dirs=['布達佩斯_千禧地鐵'], title='千禧地鐵：坐歐陸最老的地鐵去歌劇院', place='千禧地鐵 M1 Millenniumi Földalatti Vasút', cover=1),
   dict(id='budapest-opera', trip='bud', dirs=['布達佩斯_匈牙利國家歌劇院'], title='匈牙利國家歌劇院：在伊柏的金色殿堂看《卡門》', place='匈牙利國家歌劇院 Magyar Állami Operaház', cover=3, videos=[('v21','開演前的觀眾廳','11 月 26 日 17:51，從〈音樂的神化〉天花板一路拍到舞台、樂池和包廂')]),
 ]
@@ -65,6 +66,7 @@ MAPS = {
   'budapest-opera': [('匈牙利國家歌劇院', 'Hungarian State Opera House, Andrássy út 22, Budapest'), ('歌劇院站 Opera（M1）', 'Opera metro station M1, Budapest')],
   'buda-castle': [('布達城堡（國家美術館圓頂）', 'Hungarian National Gallery, Buda Castle'), ('圖魯鳥雕像', 'Turul statue Buda Castle'), ('塞切尼鏈橋', 'Széchenyi Chain Bridge, Budapest')],
   'budapest-history': [('布達佩斯歷史博物館（城堡博物館）', 'Budapest History Museum Castle Museum, Szent György tér 2')],
+  'fishermans-bastion': [('漁人堡 Halászbástya', 'Fisherman\'s Bastion, Budapest'), ('馬加什教堂', 'Matthias Church, Szentháromság tér 2, Budapest')],
   'sisipass': [('美泉宮 Schönbrunn', 'Schloss Schönbrunn, Wien'), ('西西博物館（霍夫堡）', 'Sisi Museum Hofburg, Michaelerkuppel, Wien'), ('維也納家具博物館', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
   'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
 }
@@ -163,6 +165,7 @@ for p in POSTS:
 
 # summary override text (short, in the writer's voice)
 SUMMARY = {
+  'fishermans-bastion': '大雪後的城堡區：雪地上堆了小雪人，法蘭茲・約瑟夫和西西加冕的馬加什教堂前有一棵積雪的聖誕樹，最後登上七座白塔的漁人堡，看國會大廈和多瑙河。',
   'buda-castle': '來到布達佩斯就遇上大雪：在積雪的城牆邊看霧中的多瑙河，國家美術館圓頂下的合照，七百年起落的皇宮，還有張開雙翼的圖魯鳥和 1849 年的鏈橋。',
   'budapest-history': '雪天躲進城堡博物館：茲索奈大壁爐與聖王畫像的聖伊什特萬廳、1684 年的布達版畫、1838 年大洪水，最後走進地底十五世紀的哥德式禮拜堂。',
   'budapest-opera': '坐千禧地鐵到伊柏設計的國家歌劇院看比才的《卡門》：門口的李斯特與艾爾凱爾、洛茨畫的〈音樂的神化〉、將近 3 噸的大吊燈，還有從頂層看下去的馬蹄形觀眾廳。',
@@ -223,7 +226,7 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
-SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','buda-castle':'布達城堡雪景','budapest-history':'歷史博物館','budapest-m1':'千禧地鐵','budapest-opera':'國家歌劇院《卡門》'}
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','buda-castle':'布達城堡雪景','budapest-history':'歷史博物館','fishermans-bastion':'漁人堡','budapest-m1':'千禧地鐵','budapest-opera':'國家歌劇院《卡門》'}
 trips_html = ''
 quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
