@@ -30,7 +30,7 @@ const bodyK = [
   new Paragraph({ heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, children: [new TextRun({ text: '布達城堡：下雪了，皇宮山丘上的白色早晨', font: F })] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 360 }, children: [new TextRun({ text: '匈牙利・布達佩斯・Budavári Palota｜2026 年 11 月 26 日', font: F, size: 21, color: GRAY })] }),
 
-  p('來到布達佩斯的第一個早上，就下雪了。11 月 26 日上午，我們上到多瑙河西岸的城堡山，布達城堡的屋頂、矮樹和欄杆全都蓋上一層白。11:10 太太站在城牆邊，背後是霧茫茫的多瑙河和對岸的佩斯；接著在美術館的大圓頂下拍合照、看雪片一直落下來；中午進去歷史博物館（另寫一篇），下午 14:31 出來時，又在圖魯鳥雕像和鏈橋前面停了很久。'),
+  p('11 月 25 日，我們從維也納搭奧地利聯邦鐵路（ÖBB）的火車來到布達佩斯。第二天早上就下雪了。11 月 26 日上午，我們踩著雪一路走上多瑙河西岸的城堡山，布達城堡的屋頂、矮樹和欄杆全都蓋上一層白。11:10 太太站在城牆邊，背後是霧茫茫的多瑙河和對岸的佩斯；接著在美術館的大圓頂下拍合照、看雪片一直落下來；中午進去歷史博物館（另寫一篇），下午 14:31 出來時，又在圖魯鳥雕像和鏈橋前面停了很久。'),
 
   h1('一、山丘上的皇宮：七百多年的起落'),
   p('布達城堡（Budavári Palota）是歷代匈牙利國王的城堡和宮殿，蓋在城堡山的南端，旁邊就是滿是中世紀、巴洛克和新古典房子的城堡區。這裡從中世紀起就是王宮所在，15 世紀盧森堡王朝的西吉斯蒙德國王、後來的馬加什一世，都把它擴建得極其華麗。'),
@@ -58,8 +58,8 @@ const bodyK = [
 
   h1('旅人小記'),
   bullet('時間（依檔名與影片 metadata）：11 月 26 日（週四）11:10 城牆邊 → 11:22 國家美術館圓頂（影片 v22）→ 11:47 歐根親王雕像下（影片 v23，GPS 47.4966, 19.0403）→ 約 12:19–13:58 布達佩斯歷史博物館（另一篇）→ 14:31 圖魯鳥與鏈橋 → 傍晚 17:16 搭千禧地鐵去歌劇院。'),
-  bullet('交通：可以從鏈橋旁的克拉克・亞當廣場坐纜車（Sikló）上山，或搭公車上城堡區；雪天石板路和階梯很滑，要穿防滑的鞋。'),
-  bullet('待確認：我們是怎麼上山的（纜車、公車還是走路）；第一張照片遠方的白色吊橋是不是伊莉莎白橋；圖魯鳥是 1903 還是 1905 年揭幕；有沒有進國家美術館；這是不是布達佩斯今年的第一場雪。'),
+  bullet('交通：11/25 從維也納搭 ÖBB 火車到布達佩斯。上城堡山我們是走路上去的；也可以從鏈橋旁的克拉克・亞當廣場坐纜車（Sikló），或搭公車上城堡區。雪天石板路和階梯很滑，要穿防滑的鞋。'),
+  bullet('待確認：第一張照片遠方的白色吊橋是不是伊莉莎白橋；圖魯鳥是 1903 還是 1905 年揭幕；有沒有進國家美術館；這是不是布達佩斯今年的第一場雪。'),
   new Paragraph({ spacing: { before: 360 }, border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC', space: 8 } }, children: [new TextRun({ text: '參考資料：Wikipedia（布達城堡、1541 與 1686 年布達圍城、國家豪斯曼計畫、唐納特・久洛）、budavar.btk.mta.hu（豪斯曼擴建、A–F 棟分配）、habsburger.net（伊柏與豪斯曼）、Hungaricana《Walks in the Castle District》（歐根親王像、圖魯鳥）、aviewoncities、wanderlog（歐根親王像）、welovebudapest、Daily News Hungary（圖魯鳥修復）、Lonely Planet（圖魯傳說）。', font: F, size: 17, color: GRAY })] }),
 ];
 
