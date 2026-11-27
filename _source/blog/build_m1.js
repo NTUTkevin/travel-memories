@@ -1,0 +1,87 @@
+const fs = require('fs');
+const { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, LevelFormat, BorderStyle, Footer, PageNumber } = require('docx');
+
+const F = { ascii: 'Georgia', hAnsi: 'Georgia', eastAsia: 'Microsoft JhengHei', cs: 'Georgia' };
+const GOLD = '8A6A2F', WINE = '7A2E2E', GRAY = '666666';
+
+const p = (text, opts = {}) => new Paragraph({ spacing: { after: 160, line: 360 }, ...opts.para, children: [new TextRun({ text, font: F, size: 23, ...opts.run })] });
+const h1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text: t, font: F })] });
+const h2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text: t, font: F })] });
+const bullet = (t) => new Paragraph({ numbering: { reference: 'b', level: 0 }, spacing: { after: 100, line: 340 }, children: [new TextRun({ text: t, font: F, size: 23 })] });
+const verse = (t, ref) => new Paragraph({
+  alignment: AlignmentType.CENTER, spacing: { before: 160, after: 200, line: 360 },
+  children: [new TextRun({ text: t, font: F, size: 23, italics: true, color: WINE }), new TextRun({ text: '　—— ' + ref + '（和合本）', font: F, size: 20, color: GRAY })],
+});
+const heart = (t) => new Paragraph({
+  spacing: { before: 120, after: 200, line: 360 }, indent: { left: 360, right: 240 },
+  border: { left: { style: BorderStyle.SINGLE, size: 18, color: GOLD, space: 12 } },
+  children: [new TextRun({ text: '我們的感動　', font: F, size: 21, bold: true, color: GOLD }), new TextRun({ text: t, font: F, size: 23, color: '333333' })],
+});
+const img = (name, w, h, cap) => {
+  const W = 430, scale = W / w, width = h > w ? 280 : W, height = Math.round(h * (width / w));
+  return [
+    new Paragraph({ alignment: AlignmentType.CENTER, keepNext: true, spacing: { before: 200, after: 60 }, children: [new ImageRun({ type: 'jpg', data: fs.readFileSync('img/' + name + '.jpg'), transformation: { width, height }, altText: { title: cap, description: cap, name } })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 }, children: [new TextRun({ text: cap, font: F, size: 19, color: GRAY, italics: true })] }),
+  ];
+};
+const L = [1400, 1051], P = [1051, 1400];
+const bodyK = [
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: '旅行的生活紀錄', font: F, size: 22, color: GOLD, bold: true })] }),
+  new Paragraph({ heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, children: [new TextRun({ text: '千禧地鐵：坐歐陸最老的地鐵去歌劇院', font: F })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 360 }, children: [new TextRun({ text: '匈牙利・布達佩斯・Millenniumi Földalatti Vasút（M1）｜2026 年 11 月 26 日', font: F, size: 21, color: GRAY })] }),
+
+  p('11 月 26 日，我們從維也納來到布達佩斯。傍晚五點多，在市中心的沃勒什馬爾蒂廣場（Vörösmarty tér）走下樓梯，搭上黃色的 1 號線地鐵，往歌劇院（Opera）去。我們原本以為它是「一百年的地鐵」，查了才知道更老：它 1896 年開通，到今年剛好 130 歲，是歐洲大陸第一條地鐵。'),
+
+  h1('一、1896 年：為了建國一千年而蓋的地鐵'),
+  p('1896 年是匈牙利的「千禧年」：紀念馬扎爾人來到喀爾巴阡盆地滿一千年。布達佩斯為此辦了盛大的千禧博覽會，會場在城東的城市公園（Városliget），預計會湧進大批人潮。'),
+  p('從市中心到城市公園，走的是剛蓋好不久、兩旁都是華麗宅邸的安德拉什大街（Andrássy út）。當時的電車公司總經理巴拉日・莫爾（Balázs Mór）提出一個大膽的想法：不在大街上鋪路面電車，而是把電車放到地底下（當局為什麼不讓地面電車走這條大街，各家說法不一，待確認）。工程由德國的西門子與哈爾斯克公司（Siemens & Halske）負責，1894 年開工。他們沒有用鑽的，而是直接把安德拉什大街挖開、做好隧道再蓋回去（明挖覆蓋法），只花了大約 21 個月就完工。因為隧道很淺，車廂也做得特別低矮，到今天仍是這條線的特色。'),
+  p('1896 年 5 月 2 日，千禧博覽會開幕當天下午，地鐵正式通車。皇帝法蘭茲・約瑟夫——就是我們在維也納一路「遇到」的那位西西的丈夫——那天並沒有去坐，而是 5 月 8 日才搭著專門為他準備的皇家車廂，從起點吉賽拉廣場（就是今天的沃勒什馬爾蒂廣場）坐到博覽會。之後這條線就以他命名，叫「法蘭茲・約瑟夫地下電氣鐵路」。它是倫敦之後全世界第二古老的地鐵，也是歐洲大陸的第一條。'),
+  p('布達佩斯人暱稱它「小地下鐵」（kisföldalatti），因為它比後來的 2、3、4 號線小得多。全線從沃勒什馬爾蒂廣場到墨西哥路（Mexikói út），約 4.4 公里、11 站。1973 年延伸到現在的終點，同一年換上匈牙利岡茨（Ganz）工廠做的黃色鉸接式車廂，一直開到現在；2002 年，安德拉什大街和千禧地鐵一起被列為世界遺產。'),
+  p('今年 5 月，營運的 BKV 才剛慶祝它 130 歲生日。就在我們來的十天前（2026 年 11 月 16 日），布達佩斯交通中心 BKK 發起了全線翻新與延長的設計招標：未來每一站都要做到無障礙，路線也要延伸到拉科什倫德佐車站（Rákosrendező）；五十多年的老車廂也已經到了該換的時候。現在搭到的，可能是「老樣子」的最後幾年。'),
+  ...img('bud_m1_train', 750, 1000, '17:19，沃勒什馬爾蒂廣場站：黃色的列車停在月台邊，旁邊是綠色的鉚釘鐵柱，軌道盡頭有黑白條紋的擋車器——這裡是全線的起點站'),
+  verse('一代過去，一代又來，地卻永遠長存。', '傳道書 1:4'),
+  heart('130 年前的人，為了慶祝一千年，在地底下挖出一條路。坐在這麼老的車廂裡，覺得自己好像也只是長長歷史裡的一班乘客；城市一代一代換人，這條小小的地鐵還在載著大家往前走。'),
+
+  h1('二、沃勒什馬爾蒂廣場站：從皇帝的女兒到詩人的名字'),
+  p('我們上車的這一站，1896 年開通時叫「吉賽拉廣場站」。廣場從 1874 年起以吉賽拉女大公（Gisela）命名——她是法蘭茲・約瑟夫和西西的女兒。1918 到 1920 年短暫改名，之後又叫回吉賽拉廣場，直到 1926 年才改成現在的名字，紀念詩人沃勒什馬爾蒂・米哈伊（Vörösmarty Mihály，1800–1855）。'),
+  p('沃勒什馬爾蒂是匈牙利浪漫主義最重要的詩人和劇作家之一。他 1836 年寫的詩〈號召〉（Szózat），呼籲匈牙利人無論如何都要忠於祖國，後來被譜成歌，成了匈牙利的「第二國歌」。廣場中央有他的坐像紀念碑，由泰爾奇・艾德（Telcs Ede）和卡洛什・艾德（Kallós Ede）製作，1908 年落成，台座上刻著〈號召〉的詩句。廣場北邊則是 1858 年開業的老咖啡館傑爾博（Café Gerbeaud）；每年冬天，這裡也是布達佩斯最有名的聖誕市集場地之一，從 11 月中開到元旦清晨。'),
+  p('車站本身很小，兩邊各一個側月台，就在廣場北側地下。現在看到的酒紅色和白色磁磚、有花紋外框的站名牌，是 1990 年代整條線大翻修時，照原本 1896 年的樣式重新做的。站名牌的字體細長優雅，很有世紀末的味道，太太一看到就說要在這裡拍照。'),
+  ...img('bud_m1_sign', 750, 1000, '太太戴著黑色報童帽、紅圍巾，站在「VÖRÖSMARTY TÉR」磁磚站名牌下：酒紅與白色的磁磚、上緣波浪形的拱頂，都是 1896 年的樣式'),
+  verse('耶路撒冷啊，我若忘記你，情願我的右手忘記技巧！', '詩篇 137:5'),
+  heart('一個廣場換過好幾次名字，最後留下來的，是一位寫詩叫人別忘記家鄉的詩人。我們離家這麼遠，在他的名字下面拍照，反而更想念自己的家。'),
+
+  h1('三、坐到歌劇院站：伊柏的歌劇院'),
+  p('從沃勒什馬爾蒂廣場出發，經過戴阿克廣場（Deák Ferenc tér）、巴伊奇－日林斯基路（Bajcsy-Zsilinszky út），第三站就是歌劇院站（Opera），大約三分鐘。一出站，對面就是匈牙利國家歌劇院（Magyar Állami Operaház），地址是安德拉什大街 22 號。'),
+  p('歌劇院由匈牙利建築師伊柏・米克洛什（Ybl Miklós，1814–1891）設計。當年邀請了六位建築師參加競圖，評審壓倒性地選了伊柏的方案。它是新文藝復興風格，1875 年開工，1884 年 9 月 27 日在法蘭茲・約瑟夫皇帝出席下盛大開幕。當時有一個條件：盡量使用匈牙利的工人和材料，只有少數例外，例如卡拉拉的大理石和美因茲的大吊燈。裡面的壁畫和雕塑出自洛茨・卡羅伊（Lotz Károly）、塞凱伊・貝爾塔蘭（Székely Bertalan）等匈牙利畫家；據說西西很喜歡來這裡，有時皇帝沒空，她也會自己來看戲。'),
+  p('歌劇院在 1980 到 1984 年整修過一次，2017 年再度關閉、大規模翻新和現代化，將近五年後，2022 年 3 月 12 日以盛大的晚會重新開幕。'),
+  p('（這一段還沒有照片：如果有拍到歌劇院外觀或裡面，請再傳給我，我會補進來。我們到歌劇院是去看演出、參加導覽，還是只是路過，也請告訴我。）'),
+  verse('要用琴歌頌耶和華，用琴和詩歌的聲音歌頌他！', '詩篇 98:5'),
+  heart('從維也納的金色大廳，到布達佩斯的歌劇院，這趟旅行好像一直被音樂牽著走。皇帝和西西當年坐過的路線，我們用三分鐘就到了。'),
+
+  h1('旅人小記'),
+  bullet('時間（依檔名）：11 月 26 日（週四）17:16–17:19 在沃勒什馬爾蒂廣場站拍照、搭車，往歌劇院站。'),
+  bullet('路線：M1 黃線，沃勒什馬爾蒂廣場 → 戴阿克廣場（可轉 M2、M3）→ 巴伊奇－日林斯基路 → 歌劇院，三站約 3 分鐘。'),
+  bullet('小提醒：M1 的月台很淺，很多站下樓梯就到；中途站的兩個月台常常各有各的入口，各走一個方向，下樓前先看清楚往哪個方向。上車前記得在月台的打票機打票（票價與我們用的是哪種票，待確認）。'),
+  bullet('第二站戴阿克廣場的地下道裡，有一座用舊車站改成的地下鐵博物館（目前是否開放、我們有沒有去，待確認）。'),
+  bullet('待確認：到歌劇院之後做了什麼（看演出、導覽或路過）、有沒有歌劇院的照片；有沒有逛沃勒什馬爾蒂廣場的聖誕市集或傑爾博咖啡館；搭車用的是單程票還是交通卡。'),
+  bullet('附記：雲端照片資料夾另有一張太太在站名牌下的照片（03，角度和 01 很接近，所以沒放進文章）。'),
+  new Paragraph({ spacing: { before: 360 }, border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC', space: 8 } }, children: [new TextRun({ text: '參考資料：BKV（千禧地鐵歷史、130 週年）、BKK（2026 年 11 月 16 日 M1 翻新與延長設計招標）、IEEE Milestone（Budapest Metroline No.1, 1896）、Várnagy Zoltán《Urban Transportation》（皇家車廂與 1896 年 5 月 8 日）、UrbanRail.net（站名沿革、1973 延伸、1990 年代依原樣翻修）、Hungarian Conservative、welovebudapest（21 個月、世界遺產）、Wikipedia（M1、沃勒什馬爾蒂廣場、沃勒什馬爾蒂・米哈伊、傑爾博咖啡館、匈牙利國家歌劇院）、opera.hu（歌劇院興建與 2022 年重新開幕）、Time Out Budapest（紀念碑與聖誕市集）。', font: F, size: 17, color: GRAY })] }),
+];
+
+const mk = (children) => new Document({
+  styles: {
+    default: { document: { run: { font: F, size: 23 } } },
+    paragraphStyles: [
+      { id: 'Title', name: 'Title', basedOn: 'Normal', run: { font: F, size: 52, bold: true, color: '2B2B2B' }, paragraph: { spacing: { before: 0, after: 120 }, keepNext: true } },
+      { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: F, size: 32, bold: true, color: WINE }, paragraph: { spacing: { before: 480, after: 200 }, keepNext: true, outlineLevel: 0 } },
+      { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: F, size: 27, bold: true, color: GOLD }, paragraph: { spacing: { before: 320, after: 160 }, keepNext: true, outlineLevel: 1 } },
+    ],
+  },
+  numbering: { config: [{ reference: 'b', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 300 } } } }] }] },
+  sections: [{
+    properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1300, bottom: 1300, left: 1300, right: 1300 } } },
+    footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '旅行的生活紀錄・布達佩斯・千禧地鐵　', font: F, size: 17, color: GRAY }), new TextRun({ children: [PageNumber.CURRENT], font: F, size: 17, color: GRAY })] })] }) },
+    children,
+  }],
+});
+Packer.toBuffer(mk(bodyK)).then((b) => fs.writeFileSync('布達佩斯_千禧地鐵.docx', b));
