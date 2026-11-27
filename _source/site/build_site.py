@@ -29,6 +29,7 @@ POSTS = [
   dict(id='sisipass', trip='vie', dirs=['維也納_SisiPass三館'], title='Sisi Pass：一張票，跟著西西走三個地方', place='Sisi Pass 美泉宮・西西博物館・家具博物館', cover=1),
   dict(id='rathaus-xmas', trip='vie', dirs=['維也納_市政廳聖誕市集'], title='市政廳聖誕市集：維也納最盛大的聖誕夜色', place='市政廳聖誕市集 Wiener Christkindlmarkt', cover=0, videos=[('v18','星星樹下的太太','17:39，市政廳公園裡掛滿星星的燈樹，最後鏡頭帶到市政廳鐘樓'),('v19','熊樂團','17:41，公園小木屋裡會動的熊樂團，唱歌、吹喇叭、彈吉他'),('v20','還願教堂的「光的無限」','18:00，還願教堂兩座塔之間的紅色無限符號')]),
   dict(id='budapest-m1', trip='bud', dirs=['布達佩斯_千禧地鐵'], title='千禧地鐵：坐歐陸最老的地鐵去歌劇院', place='千禧地鐵 M1 Millenniumi Földalatti Vasút', cover=1),
+  dict(id='budapest-opera', trip='bud', dirs=['布達佩斯_匈牙利國家歌劇院'], title='匈牙利國家歌劇院：在伊柏的金色殿堂看《卡門》', place='匈牙利國家歌劇院 Magyar Állami Operaház', cover=3, videos=[('v21','開演前的觀眾廳','11 月 26 日 17:51，從〈音樂的神化〉天花板一路拍到舞台、樂池和包廂')]),
 ]
 
 TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡'),('vie','奧地利・維也納','2026 年 11 月 22 日起','2026 年 11 月 22 日起 · 維也納'),('bud','匈牙利・布達佩斯','2026 年 11 月 26 日起','2026 年 11 月 26 日起 · 布達佩斯')]
@@ -59,6 +60,7 @@ MAPS = {
   'moebel': [('維也納家具博物館 Möbelmuseum Wien', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
   'rathaus-xmas': [('維也納市政廳聖誕市集', 'Wiener Christkindlmarkt Rathausplatz, Wien'), ('愛心樹（市政廳公園）', 'Rathauspark Wien'), ('城堡劇院 Burgtheater', 'Burgtheater, Universitätsring 2, Wien'), ('還願教堂 Votivkirche', 'Votivkirche, Rooseveltplatz, Wien')],
   'budapest-m1': [('沃勒什馬爾蒂廣場站 Vörösmarty tér', 'Vörösmarty tér metro station, Budapest'), ('歌劇院站 Opera', 'Opera metro station M1, Budapest'), ('匈牙利國家歌劇院', 'Hungarian State Opera House, Andrássy út 22, Budapest')],
+  'budapest-opera': [('匈牙利國家歌劇院', 'Hungarian State Opera House, Andrássy út 22, Budapest'), ('歌劇院站 Opera（M1）', 'Opera metro station M1, Budapest')],
   'sisipass': [('美泉宮 Schönbrunn', 'Schloss Schönbrunn, Wien'), ('西西博物館（霍夫堡）', 'Sisi Museum Hofburg, Michaelerkuppel, Wien'), ('維也納家具博物館', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
   'christmas': [('聖誕市集（大教堂廣場）', 'Salzburger Christkindlmarkt, Domplatz, Salzburg'), ('主教宮廣場 Residenzplatz', 'Residenzplatz, Salzburg'), ('莫札特廣場溜冰場', 'Mozartplatz, Salzburg'), ('僧侶山觀景台', 'Museum der Moderne Mönchsberg, Salzburg')],
 }
@@ -157,6 +159,7 @@ for p in POSTS:
 
 # summary override text (short, in the writer's voice)
 SUMMARY = {
+  'budapest-opera': '坐千禧地鐵到伊柏設計的國家歌劇院看比才的《卡門》：門口的李斯特與艾爾凱爾、洛茨畫的〈音樂的神化〉、將近 3 噸的大吊燈，還有從頂層看下去的馬蹄形觀眾廳。',
   'budapest-m1': '來到布達佩斯，坐上 1896 年為建國千年而蓋、今年剛好 130 歲的歐陸第一條地鐵：從詩人沃勒什馬爾蒂的廣場出發，三站就到伊柏設計的國家歌劇院。',
   'cafe-birthday': '1923 年的老咖啡館 Diglas 沒有位子，併桌認識了一個人來維也納慶生的印度朋友；晚餐一大盤肋排，再到卡爾廣場的聖誕市集看小羊。',
   'musikverein': '晚上走進新年音樂會的那座金色大廳：1812 年的音樂之友協會、漢森設計的「音樂神殿」、女像柱與繆思天花板，還有穿著古裝、戴假髮演出的莫札特音樂會。',
@@ -214,7 +217,7 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
-SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','budapest-m1':'千禧地鐵'}
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','budapest-m1':'千禧地鐵','budapest-opera':'國家歌劇院《卡門》'}
 trips_html = ''
 quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
