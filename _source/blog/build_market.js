@@ -1,0 +1,114 @@
+const fs = require('fs');
+const { Document, Packer, Paragraph, TextRun, ImageRun, HeadingLevel, AlignmentType, LevelFormat, BorderStyle, Footer, PageNumber } = require('docx');
+
+const F = { ascii: 'Georgia', hAnsi: 'Georgia', eastAsia: 'Microsoft JhengHei', cs: 'Georgia' };
+const GOLD = '8A6A2F', WINE = '7A2E2E', GRAY = '666666';
+
+const p = (text, opts = {}) => new Paragraph({ spacing: { after: 160, line: 360 }, ...opts.para, children: [new TextRun({ text, font: F, size: 23, ...opts.run })] });
+const h1 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun({ text: t, font: F })] });
+const h2 = (t) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun({ text: t, font: F })] });
+const bullet = (t) => new Paragraph({ numbering: { reference: 'b', level: 0 }, spacing: { after: 100, line: 340 }, children: [new TextRun({ text: t, font: F, size: 23 })] });
+const verse = (t, ref) => new Paragraph({
+  alignment: AlignmentType.CENTER, spacing: { before: 160, after: 200, line: 360 },
+  children: [new TextRun({ text: t, font: F, size: 23, italics: true, color: WINE }), new TextRun({ text: '　—— ' + ref + '（和合本）', font: F, size: 20, color: GRAY })],
+});
+const heart = (t) => new Paragraph({
+  spacing: { before: 120, after: 200, line: 360 }, indent: { left: 360, right: 240 },
+  border: { left: { style: BorderStyle.SINGLE, size: 18, color: GOLD, space: 12 } },
+  children: [new TextRun({ text: '我們的感動　', font: F, size: 21, bold: true, color: GOLD }), new TextRun({ text: t, font: F, size: 23, color: '333333' })],
+});
+const img = (name, w, h, cap) => {
+  const W = 430, scale = W / w, width = h > w ? 280 : W, height = Math.round(h * (width / w));
+  return [
+    new Paragraph({ alignment: AlignmentType.CENTER, keepNext: true, spacing: { before: 200, after: 60 }, children: [new ImageRun({ type: 'jpg', data: fs.readFileSync('img/' + name + '.jpg'), transformation: { width, height }, altText: { title: cap, description: cap, name } })] }),
+    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 }, children: [new TextRun({ text: cap, font: F, size: 19, color: GRAY, italics: true })] }),
+  ];
+};
+const L = [1400, 1051], P = [1051, 1400];
+const bodyK = [
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 80 }, children: [new TextRun({ text: '旅行的生活紀錄', font: F, size: 22, color: GOLD, bold: true })] }),
+  new Paragraph({ heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER, children: [new TextRun({ text: '中央市場：一條圍巾、兩塊 rétes 和一碗家常菜', font: F })] }),
+  new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 360 }, children: [new TextRun({ text: '匈牙利・布達佩斯・Nagy Vásárcsarnok（Központi Vásárcsarnok）｜2026 年 11 月 27 日', font: F, size: 21, color: GRAY })] }),
+
+  p('11 月 27 日（週五）中午一點多，我們來到自由橋（Szabadság híd）佩斯這一頭的海關廣場（Fővám tér），走進布達佩斯最大、也最老的室內市場——中央市場。這一趟有三件事：太太在二樓挑了一條喀什米爾圍巾，我們在手拉酥皮的 rétes 攤買了兩塊，最後在二樓的小吃攤坐下來，吃一碗匈牙利家常菜。'),
+
+  h1('一、1897 年：為千禧年蓋、卻晚了半年才開的市場'),
+  p('十九世紀後半，布達佩斯在 1867 年奧匈「妥協」之後快速長大，到了世紀末已經有五十多萬人。當時全市有 44 個露天市場，四千到八千個攤販在街上擺攤，交通和衛生都是大問題。市議會於是決定改蓋一整套有屋頂的「市場廳」，由布達佩斯第一任市長卡默邁爾・卡羅伊（Kamermayer Károly）推動，中央市場就是其中最大的一筆投資。'),
+  p('1891 年市府辦了設計競圖，收到九份作品。評審原本把三件並列第一，經過一番爭論，最後採用布達佩斯工業大學建築教授佩茨・薩穆（Pecz Samu，1854–1922）的方案。1894 年 2 月 21 日市議會通過他的設計，同年夏天開工，目標是趕在 1896 年匈牙利建國千年的千禧博覽會時開幕。'),
+  p('偏偏在 1896 年 7 月 30 日，離完工只差大約十天，幾乎蓋好的大樓失火，屋頂結構嚴重燒毀；調查了一年也沒查出起火原因。佩茨重新設計修復，加了更多消防栓和屋頂的逃生口。攤販從 1897 年 2 月 1 日起就可以先免租金開賣，正式開幕是 1897 年 2 月 15 日，和佩斯另外四座市場廳同一天啟用；已經退休的卡默邁爾市長也出席了開幕。'),
+  p('這座市場在當年是非常先進的設計：鋼鐵骨架由施利克（Schlick）鐵工廠製造，屋頂和立面的彩色陶瓷來自佩奇（Pécs）的若納伊（Zsolnay）工廠；因為緊鄰多瑙河，地基打了一公尺厚的混凝土來防地下水。地下還有一條約 120 公尺長的隧道通到多瑙河碼頭，貨物從船上卸下後可以直接用小軌道推進市場。正面門口上方的招牌寫著「I. számú vásárcsarnok」，意思是「第一號市場廳」。'),
+  ...img('mkt_facade', 787, 1050, '13:20，中央市場正門：紅黃磚交錯的大拱、新哥德式尖頂和兩隻石獅，門上寫著「I. SZÁMÚ VÁSÁRCSARNOK」（第一號市場廳）；屋頂斜面看得到若納伊彩色瓦片的菱形花紋。門口掛著「VASÁRNAP IS NYITVA／OPEN ON SUNDAY」（週日也營業）的布條'),
+  p('市場前面就是海關廣場的電車站。影片 v24 拍到一輛黃白色的電車從市場前開過去，車號 1349，看起來是 47／49 號線使用的岡茨（Ganz）老電車（CSMG 型，自 1970 年代起行駛，待確認）；這兩條線從市場前出發，跨過自由橋到布達那一邊。沿著多瑙河岸走的 2 號電車和地鐵 M4，也都在這裡停靠。'),
+  verse('萬民都舉目仰望你；你隨時給他們食物。你張手，使有生氣的都隨願飽足。', '詩篇 145:15–16'),
+  heart('一場大火，讓一座為了慶祝千年而蓋的市場晚了半年才開門。可是它一開就開了一百二十九年，養活了一代又一代的布達佩斯人。我們只是今天中午其中兩個來吃飯的人，卻覺得很被款待。'),
+
+  h1('二、鐵與玻璃的大廳：戰火、修復與「歐洲最美的市場」'),
+  p('走進門，是一條長約 150 公尺、高約 28 公尺的主通道，兩邊是鋼鐵拱架撐起的玻璃天窗。建成時，一邊做零售、另一邊做批發；後來城市長得太快，1902 年就把批發市場和側廊的軌道移出去了。'),
+  p('第二次世界大戰中，市場受到嚴重損壞，戰後倉促修補，此後幾十年狀況一直不好。1977 年它被列為受保護的古蹟；1991 到 1994 年，市府進行了全面整修，還原了若納伊的彩色瓦片，也把市場擴建成現在的三層：地下室賣魚、醃菜和超市，一樓是蔬果、肉鋪、香腸和紅椒粉，二樓的迴廊則是紀念品、手工藝和小吃攤。這次修復在 1999 年得到國際不動產聯合會（FIABCI）的卓越獎。'),
+  p('來過這裡的名人很多，常被提到的有德皇威廉二世、佛洛伊德、法蘭茲・約瑟夫皇帝，以及 1980 年代來訪的英國首相柴契爾夫人。2013 年 CNN Travel 把它選為歐洲最好的市場之一。經營單位說，現在這裡每天大約有五萬名訪客。'),
+  ...img('mkt_hall', 787, 1050, '13:56，從二樓迴廊往下看：紅色的鋼鐵屋架、兩側整排玻璃窗，聖誕燈串從屋頂垂下，右邊是一棵用燈串做的大聖誕樹；遠處盡頭是正門內側的大圓窗。下面的通道擠滿了人，紅色屋頂的小攤都在賣聖誕用品'),
+  verse('我的居所必在他們中間；我要作他們的神，他們要作我的子民。', '以西結書 37:27'),
+  heart('從樓上往下看，人來人往，聖誕燈一串一串亮著。這個屋頂下燒過、炸過、也修好過；現在大家只是很平常地在這裡買菜、聊天、挑禮物。平常的日子能好好過下去，就是很大的恩典。'),
+
+  h1('三、紅色黃金：匈牙利的紅椒粉'),
+  p('一樓最搶眼的，是一串串掛起來的乾紅椒和一包包紅椒粉。紅椒（paprika）原產美洲，是新航路之後才傳到歐洲；1604 年的一本匈牙利字典把它叫做「土耳其胡椒」，可見它可能是經由鄂圖曼土耳其傳進來的。在塞格德（Szeged），最早提到「paprika」這個字的紀錄是 1748 年的一本帳簿。一開始它被當成退燒的藥，到了 1820 年代才開始出現在匈牙利的食譜裡，後來成了燉牛肉湯（gulyás）、魚湯和雞肉紅椒燉菜不可少的味道。'),
+  p('匈牙利紅椒粉的兩大產地，是南部的卡洛喬（Kalocsa）和塞格德，兩地都有紅椒博物館。卡洛喬人把紅椒叫做「紅色黃金」；那裡也以花朵刺繡等民俗藝術出名——二樓小吃攤招牌上那種紅、紫、綠的小花圖案，就是這類匈牙利民俗刺繡的風格。'),
+  p('紅椒還和一座諾貝爾獎有關：1930 年代在塞格德大學任教的匈牙利科學家聖捷爾吉・阿爾伯特（Szent-Györgyi Albert），用當地盛產的紅椒提取出大量維生素 C，研究維生素 C 與生物氧化，在 1937 年得到諾貝爾生理醫學獎。'),
+  ...img('mkt_paprika', 787, 1050, '13:23，影片 v25 的畫面：一樓「AGRO-FRUIT KFT.」的攤位上方，掛滿一串串乾紅椒，下面堆著紅椒粉、香料和伴手禮包裝'),
+  verse('你們要嘗嘗主恩的滋味，便知道他是美善；投靠他的人有福了！', '詩篇 34:8'),
+  heart('一種從遠方傳來、原本被當藥吃的紅色果實，最後變成一個國家的味道，還幫人找到了維生素 C。很多看起來平凡的東西，裡面都藏著別人走過的長路。'),
+
+  h1('四、太太挑的那條喀什米爾圍巾'),
+  p('1897 年市場剛開時，二樓迴廊規定不准賣食物，只賣籃子、紙類和禮品。到了今天，二樓大部分仍是紀念品與民俗手工藝的攤位，另外有幾個賣午餐的小吃攤。我們在二樓的通道裡，看到一整排掛滿圍巾、披肩、毛帽和皮草背心的攤子。'),
+  p('太太在這裡挑了一條喀什米爾（cashmere）圍巾。喀什米爾的名字來自南亞的喀什米爾地區，指的是高山山羊身上那層細軟的底絨；十八、十九世紀，喀什米爾披肩傳到歐洲，曾經是貴婦人最想要的奢侈品之一。在中歐的冬天，一條暖和的圍巾比什麼紀念品都實用。（她挑的是哪一條、什麼顏色、多少錢，待確認。比對照片，13:45 她圍的是紅圍巾，14:03 吃飯時換成一條白色長圍巾，白色那條可能就是新買的，待確認。）'),
+  ...img('mkt_scarf', 787, 1050, '13:45，二樓圍巾攤：太太伸手摸著架上一件一件的毛皮背心和圍巾，脖子上掛著相機；後面是一整排五顏六色的圍巾、披肩和帶毛球的毛帽，抬頭就是鋼鐵屋架和玻璃天窗'),
+  verse('她不因下雪為家裡的人擔心，因為全家都穿著朱紅衣服。', '箴言 31:21'),
+  heart('看她一條一條摸、一條一條比，挑得很認真。在下過雪的布達佩斯，買到一條暖和的圍巾，好像就把這個冬天的回憶也一起圍在脖子上了。'),
+
+  h1('五、手拉的 rétes：薄到可以看報紙的酥皮'),
+  p('一樓的一個藍色木頭攤位，招牌寫著「Kézzel nyújtott házi-rétes」，意思是「手工拉皮的家常 rétes」。rétes 就是德語說的「Strudel」，匈牙利文的名字來自「réteges」（一層一層的）。一般認為它是十六、十七世紀鄂圖曼佔領匈牙利時，從土耳其的果仁蜜餅（baklava）演變來的；最早的文字紀錄是 1549 年，寫的是在薄麵皮上一層層抹奶油、撒糖去烤。後來才變成把餡料捲在極薄的麵皮裡，再經由哈布斯堡王朝傳到維也納與整個帝國。'),
+  p('真正的 rétes 麵皮是用手在鋪著布的大桌子上慢慢拉開，拉到薄得像紙，匈牙利人常說「薄到可以透過它讀報紙」。十八世紀以後它從貴族的餐桌傳到農家，長久以來都是婚禮、受洗、新年、命名日才做的節慶點心；匈牙利人也相信在新年或嘉年華（Farsang）吃 rétes 會帶來好運和長壽。十九世紀，巴黎的麗池酒店甚至把「匈牙利 rétes」放上菜單，還特地從匈牙利訂麵粉、派甜點師到佩斯學手藝。'),
+  p('這個攤位的招牌上用匈、德、英三種語言列出十幾種口味：乳酪（túrós）、杏桃乳酪、酸櫻桃乳酪、蒔蘿乳酪、南瓜罌粟籽、蘋果罌粟籽、蘋果核桃、蘋果肉桂、酸櫻桃（meggyes）、李子、高麗菜、馬鈴薯……甜鹹都有，每塊 890 福林。我們買了兩塊：右邊紅色那塊是酸櫻桃，左邊咖啡色的那塊是什麼口味（李子、罌粟籽或核桃？）待確認。'),
+  ...img('mkt_retes_case', 787, 1050, 'rétes 攤的玻璃櫃（IMG_3827）：下層是一排排長條的 rétes，小牌子寫著「SZILVÁS RÉTES／李子」「MEGGYES RÉTES／酸櫻桃」「MÁKOS RÉTES／罌粟籽」，每塊 890 福林；上層是馬鈴薯小圓餅（Burgonyás pogácsa）、煙燻乳酪條、乳酪蝴蝶結酥等鹹點'),
+  ...img('mkt_retes_hand', 787, 1050, '我們的兩塊 rétes（IMG_3828）：左邊咖啡色、右邊是滿滿酸櫻桃的紅色內餡，薄薄的酥皮一層一層；背景是正在幫客人夾點心的店員'),
+  ...img('mkt_retes_sign', 787, 1050, '攤位招牌（IMG_3829）：「Kézzel nyújtott házi-RÉTES」（手拉家常 rétes），下面是匈、德、英三語的口味表，左邊貼著「RÉTES 890,-/db」；櫃台上掛著兩個大扭結麵包'),
+  verse('都比金子可羨慕，且比極多的精金可羨慕；比蜜甘甜，且比蜂房下滴的蜜甘甜。', '詩篇 19:10'),
+  heart('這種點心要很有耐心，一點一點把麵皮拉開，拉破了就得重來。咬下去的時候酥皮在嘴裡碎掉，酸櫻桃的酸甜跑出來——吃得到有人為我們花的工夫。'),
+
+  h1('六、二樓的午餐：Panoráma 的匈牙利家常菜'),
+  p('逛累了，我們在二樓迴廊一個叫「Panoráma Ételbár」（全景小吃吧）的攤位吃午餐。攤位上用匈牙利國旗的紅白綠和民俗刺繡小花當裝飾，菜單寫著燉牛肉湯（Goulash）、匈牙利魚湯（Hungarian fishsoup）、填餡高麗菜（Stuffed cabbage）和紅椒雞（Chicken paprikash），旁邊還賣熱紅酒（Forralt bor，1,500 福林）、熱茶（1,000 福林）、葡萄酒、帕林卡水果白蘭地和烏尼古藥草酒。點餐方式是先在左邊點、再到右邊付錢。'),
+  p('我們點了一碗湯和兩顆淋著紅色醬汁的填餡菜。填餡高麗菜（töltött káposzta）是把高麗菜葉捲著豬絞肉、米飯和洋蔥，用紅椒和酸菜一起燉，上桌時常加一匙酸奶油。它源自鄂圖曼土耳其，十八世紀在匈牙利流行起來；早期的食譜還沒有紅椒，而是用葡萄酒來燉。到今天，它仍是匈牙利聖誕節和婚宴上不能少的一道菜：冬天殺豬做的新鮮豬肉正好拿來包，而且放到第二天再熱更好吃。（我們吃的兩顆是填餡高麗菜，還是填餡甜椒 töltött paprika；那碗湯是燉牛肉湯還是魚湯，待確認。）'),
+  p('桌面印著「Panoráma Ételbár」和匈牙利國旗的弧線，也寫著用餐區只能吃這家買的食物。窗外是市場二樓的大玻璃窗和鐵架，冬天的光從窗外照進來，吃熱湯剛剛好。'),
+  ...img('mkt_panorama', 787, 1050, '13:57，Panoráma Ételbár：招牌上的匈牙利國旗與「Traditional Hungarian」，菜單寫著 Goulash、Hungarian fishsoup、Stuffed cabbage、Chicken paprikash；櫃台前貼著熱紅酒 1,500 福林、熱茶 1,000 福林的小牌子，客人正在排隊點餐'),
+  ...img('mkt_wife', 787, 1050, '14:03，太太坐在小圓桌前，圍著白色長圍巾、戴黑色報童帽；桌上一碗紅色的湯和一盤兩顆淋了紅醬的填餡菜，背後就是 Panoráma 的櫃台和「Goulash／Stuffed cabbage」招牌'),
+  ...img('mkt_selfie', 1050, 788, '14:03，兩人自拍：我戴藍色毛帽、圍著格子圍巾，太太戴黑色報童帽、圍著白色圍巾，一起在二樓小吃攤吃午餐'),
+  verse('到了坐席的時候，耶穌拿起餅來，祝謝了，擘開，遞給他們。', '路加福音 24:30'),
+  heart('一碗熱湯、兩顆燉了很久的填餡菜，坐在人來人往的市場裡吃，比餐廳還有家的味道。旅行到第九天，能這樣兩個人面對面、慢慢吃一頓飯，就很滿足。'),
+
+  h1('旅人小記'),
+  bullet('時間：11 月 27 日（週五）。影片 v24 13:19（市場前的電車）、13:20 正門、影片 v25 13:23（一樓紅椒攤與大廳）、rétes 攤（IMG_3827–3829，大約 13:25–13:40）、13:45 二樓圍巾攤、13:56 從二樓俯瞰大廳、13:57 Panoráma、14:03 午餐。照片沒有 EXIF，時間依檔名；影片 GPS 在中央市場（47.487, 19.058）。'),
+  bullet('地址：Budapest IX. kerület, Vámház körút 1–3（海關廣場 Fővám tér，自由橋佩斯端，瓦茨街 Váci utca 南端）。交通：地鐵 M4 Fővám tér 站；電車 2、47、49 號。入場免費。'),
+  bullet('開放時間（經營單位 piaconline.hu，2026 年 10 月的資料）：週一至週五 6:00–18:00、週六 6:00–16:00、週日 10:00–16:00，國定假日休息。不過也有資料寫週日不開，而且週日很多攤位不營業，去之前最好再確認。我們看到正門掛著「週日也營業」的布條。'),
+  bullet('價格（我們看到的）：rétes 每塊 890 福林；可樂 790 福林；水 490 福林；Panoráma 熱紅酒 1,500 福林、熱茶 1,000 福林。'),
+  bullet('格局：地下室——魚、醃菜、超市；一樓——蔬果、肉鋪、香腸、紅椒粉；二樓——紀念品、刺繡、圍巾與小吃攤。'),
+  bullet('待確認：太太買的喀什米爾圍巾是哪一條、顏色、價錢（白色那條是不是新買的）；咖啡色那塊 rétes 的口味；午餐的湯和填餡菜各是什麼、多少錢；v24 電車是幾號線；有沒有去地下室；這天之後還去了哪裡。'),
+  new Paragraph({ spacing: { before: 360 }, border: { top: { style: BorderStyle.SINGLE, size: 4, color: 'CCCCCC', space: 8 } }, children: [new TextRun({ text: '參考資料：piaconline.hu（中央市場經營單位：歷史、1896 年 7 月 30 日大火、1897 年 2 月 1 日與 15 日、1991–1994 整修）、hvg.hu（44 個露天市場、1994 年整修）、Szablyár Péter《Our Budapest》（隧道、四座同日開幕的市場廳）、Budapest100（佩茨・薩穆）、BME 史料（地基）、Daily News Hungary（隧道 120 公尺、28 公尺高、名人訪客、CNN 2013）、welovebudapest（1977 列為古蹟、FIABCI）、Wikipedia（Great Market Hall、Strudel、Budapest tram）、Industrial Heritage Hungary（施利克、若納伊）、Hungary Unlocked（2026 年開放時間、二樓 1897 年規定、每日訪客）、Time Out Budapest、CNEWA、New World Encyclopedia（紅椒粉）、NIH 國家醫學圖書館（聖捷爾吉與維生素 C）、Offbeat Budapest、Daily News Hungary（rétes 與填餡高麗菜）、Railpictures／ELTE（47／49 號電車）。', font: F, size: 17, color: GRAY })] }),
+];
+
+const mk = (children) => new Document({
+  styles: {
+    default: { document: { run: { font: F, size: 23 } } },
+    paragraphStyles: [
+      { id: 'Title', name: 'Title', basedOn: 'Normal', run: { font: F, size: 52, bold: true, color: '2B2B2B' }, paragraph: { spacing: { before: 0, after: 120 }, keepNext: true } },
+      { id: 'Heading1', name: 'Heading 1', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: F, size: 32, bold: true, color: WINE }, paragraph: { spacing: { before: 480, after: 200 }, keepNext: true, outlineLevel: 0 } },
+      { id: 'Heading2', name: 'Heading 2', basedOn: 'Normal', next: 'Normal', quickFormat: true, run: { font: F, size: 27, bold: true, color: GOLD }, paragraph: { spacing: { before: 320, after: 160 }, keepNext: true, outlineLevel: 1 } },
+    ],
+  },
+  numbering: { config: [{ reference: 'b', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 300 } } } }] }] },
+  sections: [{
+    properties: { page: { size: { width: 11906, height: 16838 }, margin: { top: 1300, bottom: 1300, left: 1300, right: 1300 } } },
+    footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: '旅行的生活紀錄・布達佩斯・中央市場　', font: F, size: 17, color: GRAY }), new TextRun({ children: [PageNumber.CURRENT], font: F, size: 17, color: GRAY })] })] }) },
+    children,
+  }],
+});
+Packer.toBuffer(mk(bodyK)).then((b) => fs.writeFileSync('布達佩斯_中央市場.docx', b));

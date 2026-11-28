@@ -33,6 +33,7 @@ POSTS = [
   dict(id='fishermans-bastion', trip='bud', dirs=['布達佩斯_漁人堡與馬加什教堂'], title='漁人堡與馬加什教堂：雪人、聖誕樹和七座白塔', place='漁人堡 Halászbástya・馬加什教堂', cover=5),
   dict(id='budapest-m1', trip='bud', dirs=['布達佩斯_千禧地鐵'], title='千禧地鐵：坐歐陸最老的地鐵去歌劇院', place='千禧地鐵 M1 Millenniumi Földalatti Vasút', cover=1),
   dict(id='budapest-opera', trip='bud', dirs=['布達佩斯_匈牙利國家歌劇院'], title='匈牙利國家歌劇院：在伊柏的金色殿堂看《卡門》', place='匈牙利國家歌劇院 Magyar Állami Operaház', cover=3, videos=[('v21','開演前的觀眾廳','11 月 26 日 17:51，從〈音樂的神化〉天花板一路拍到舞台、樂池和包廂')]),
+  dict(id='central-market', trip='bud', dirs=['布達佩斯_中央市場'], title='中央市場：一條圍巾、兩塊 rétes 和一碗家常菜', place='中央市場 Nagy Vásárcsarnok', cover=3, videos=[('v24','市場前的黃色電車','11 月 27 日 13:19，海關廣場上，一輛黃白色的老電車從中央市場正門前開過'),('v25','紅椒攤與大廳','13:23，一樓掛滿乾紅椒的攤位，再轉向長長的鐵與玻璃大廳')]),
 ]
 
 TRIPS = [('koe','德國・國王湖與拉姆紹','2026 年 11 月 19 日','2026 年 11 月 19 日 · 德國・國王湖'),('hal','奧地利・哈修塔特','2026 年 11 月 20 日','2026 年 11 月 20 日 · 哈修塔特'),('salz','奧地利・薩爾斯堡','2026 年 11 月 21 日','2026 年 11 月 21 日 · 薩爾斯堡'),('vie','奧地利・維也納','2026 年 11 月 22 日起','2026 年 11 月 22 日起 · 維也納'),('bud','匈牙利・布達佩斯','2026 年 11 月 25 日起','2026 年 11 月 25 日起 · 布達佩斯')]
@@ -63,6 +64,7 @@ MAPS = {
   'moebel': [('維也納家具博物館 Möbelmuseum Wien', 'Möbelmuseum Wien, Andreasgasse 7, 1070 Wien')],
   'rathaus-xmas': [('維也納市政廳聖誕市集', 'Wiener Christkindlmarkt Rathausplatz, Wien'), ('愛心樹（市政廳公園）', 'Rathauspark Wien'), ('城堡劇院 Burgtheater', 'Burgtheater, Universitätsring 2, Wien'), ('還願教堂 Votivkirche', 'Votivkirche, Rooseveltplatz, Wien')],
   'budapest-m1': [('沃勒什馬爾蒂廣場站 Vörösmarty tér', 'Vörösmarty tér metro station, Budapest'), ('歌劇院站 Opera', 'Opera metro station M1, Budapest'), ('匈牙利國家歌劇院', 'Hungarian State Opera House, Andrássy út 22, Budapest')],
+  'central-market': [('中央市場 Nagy Vásárcsarnok', 'Great Market Hall, Vámház körút 1-3, Budapest'), ('海關廣場 Fővám tér', 'Fővám tér, Budapest')],
   'budapest-opera': [('匈牙利國家歌劇院', 'Hungarian State Opera House, Andrássy út 22, Budapest'), ('歌劇院站 Opera（M1）', 'Opera metro station M1, Budapest')],
   'buda-castle': [('布達城堡（國家美術館圓頂）', 'Hungarian National Gallery, Buda Castle'), ('圖魯鳥雕像', 'Turul statue Buda Castle'), ('塞切尼鏈橋', 'Széchenyi Chain Bridge, Budapest')],
   'budapest-history': [('布達佩斯歷史博物館（城堡博物館）', 'Budapest History Museum Castle Museum, Szent György tér 2')],
@@ -168,6 +170,7 @@ SUMMARY = {
   'fishermans-bastion': '大雪後的城堡區：雪地上堆了小雪人，法蘭茲・約瑟夫和西西加冕的馬加什教堂前有一棵積雪的聖誕樹，最後登上七座白塔的漁人堡，看國會大廈和多瑙河。',
   'buda-castle': '來到布達佩斯就遇上大雪：在積雪的城牆邊看霧中的多瑙河，國家美術館圓頂下的合照，七百年起落的皇宮，還有張開雙翼的圖魯鳥和 1849 年的鏈橋。',
   'budapest-history': '雪天躲進城堡博物館：茲索奈大壁爐與聖王畫像的聖伊什特萬廳、1684 年的布達版畫、1838 年大洪水，最後走進地底十五世紀的哥德式禮拜堂。',
+  'central-market': '1897 年開幕、差點被一場大火燒掉的布達佩斯中央市場：若納伊彩瓦屋頂、鐵與玻璃的大廳、一串串紅椒，太太在二樓挑了一條喀什米爾圍巾，我們吃了手拉酥皮的 rétes 和填餡高麗菜。',
   'budapest-opera': '坐千禧地鐵到伊柏設計的國家歌劇院看比才的《卡門》：門口的李斯特與艾爾凱爾、洛茨畫的〈音樂的神化〉、將近 3 噸的大吊燈，還有從頂層看下去的馬蹄形觀眾廳。',
   'budapest-m1': '來到布達佩斯，坐上 1896 年為建國千年而蓋、今年剛好 130 歲的歐陸第一條地鐵：從詩人沃勒什馬爾蒂的廣場出發，三站就到伊柏設計的國家歌劇院。',
   'cafe-birthday': '1923 年的老咖啡館 Diglas 沒有位子，併桌認識了一個人來維也納慶生的印度朋友；晚餐一大盤肋排，再到卡爾廣場的聖誕市集看小羊。',
@@ -226,7 +229,7 @@ for idx, p in enumerate(POSTS):
   </div>
 </article>''')
 
-SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','buda-castle':'布達城堡雪景','budapest-history':'歷史博物館','fishermans-bastion':'漁人堡','budapest-m1':'千禧地鐵','budapest-opera':'國家歌劇院《卡門》'}
+SHORT = {'koenigssee':'國王湖','bartholomae':'聖巴多羅買教堂','ramsau':'拉姆紹教堂','hallstatt':'哈修塔特鹽礦','hallstatt-town':'哈修塔特小鎮','residence':'莫札特故居','birthplace':'莫札特出生地','fortress':'霍亨薩爾斯堡要塞','church':'大學教堂','moderne':'現代美術館','christmas':'薩爾斯堡聖誕市集','vienna-home':'中央車站旁的家','schoenbrunn-out':'美泉宮（室外）','schoenbrunn-in':'美泉宮（室內）','cafe-birthday':'咖啡館裡的生日','musikverein':'金色大廳莫札特音樂會','hofburg':'霍夫堡與西西博物館','moebel':'家具博物館','sisipass':'Sisi Pass 三館攻略','rathaus-xmas':'市政廳聖誕市集','buda-castle':'布達城堡雪景','budapest-history':'歷史博物館','fishermans-bastion':'漁人堡','budapest-m1':'千禧地鐵','budapest-opera':'國家歌劇院《卡門》','central-market':'中央市場'}
 trips_html = ''
 quick_html = '  <nav class="quick" aria-label="快速目錄"><b class="qt">快速目錄</b>\n'
 for k,n,d,m in TRIPS:
